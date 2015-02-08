@@ -2,6 +2,7 @@ package de.neuenberger.ai.impl.chess.model;
 
 import de.neuenberger.ai.base.model.Ply;
 import de.neuenberger.ai.impl.chess.model.ChessBoard.BoardChangerImpl;
+import de.neuenberger.ai.impl.chess.model.pieces.Pawn;
 
 /**
  * A ply is immutable.
@@ -86,5 +87,25 @@ public class ChessPly implements Ply {
 	 */
 	public void applyTo(final BoardChangerImpl boardChanger) {
 		boardChanger.movePiece(sourceX, sourceY, targetX, targetY);
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		if (piece instanceof Pawn) {
+			// do nothing
+		} else {
+			builder.append(piece.getRepresentation());
+		}
+		builder.append((char) ('a' + sourceX));
+		builder.append((char) ('1' + sourceY));
+		if (isCapture()) {
+			builder.append('x');
+		} else {
+			builder.append('-');
+		}
+		builder.append((char) ('a' + targetX));
+		builder.append((char) ('1' + targetY));
+		return builder.toString();
 	}
 }

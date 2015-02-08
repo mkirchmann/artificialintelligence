@@ -37,15 +37,14 @@ public class Pawn extends Piece {
 		}
 
 		if (x > board.getMinX()) {
-			checkPieceAndAddPly(plies, board, x, y, x - 1, y + direction, false);
+			final int newX = x - 1;
+			final int newY = y + direction;
+			checkIfIsCaptureAndIfSoAdd(plies, board, x, y, checkSaveness, promotion, newX, newY);
 		}
 		if (x < board.getMaxX()) {
 			final int newX = x + 1;
 			final int newY = y + direction;
-			final Piece pieceAt = board.getPieceAt(newX, newY);
-			if (pieceAt != null && pieceAt.getColor() != getColor()) {
-				createPlyValidateAndAddToList(board, plies, x, y, promotion, newX, newY, true, false, checkSaveness);
-			}
+			checkIfIsCaptureAndIfSoAdd(plies, board, x, y, checkSaveness, promotion, newX, newY);
 		}
 
 		// en passant.
@@ -79,6 +78,15 @@ public class Pawn extends Piece {
 			if (!moveTwo) {
 				break;
 			}
+		}
+	}
+
+	private void checkIfIsCaptureAndIfSoAdd(final List<ChessPly> plies, final Board<Piece, Color, ChessPly> board,
+			final int x, final int y, final boolean checkSaveness, final boolean promotion, final int newX,
+			final int newY) {
+		final Piece pieceAt = board.getPieceAt(newX, newY);
+		if (pieceAt != null && pieceAt.getColor() != getColor()) {
+			createPlyValidateAndAddToList(board, plies, x, y, promotion, newX, newY, true, false, checkSaveness);
 		}
 	}
 

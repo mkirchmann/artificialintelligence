@@ -20,4 +20,9 @@ public class EnPassantPly extends ChessPly {
 		boardChanger.setPieceAt(getTargetX(), otherPawnY, null);
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + " e.p.";
+	}
+
 }

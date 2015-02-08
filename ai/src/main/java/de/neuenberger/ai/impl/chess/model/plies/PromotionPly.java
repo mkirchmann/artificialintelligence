@@ -27,4 +27,9 @@ public class PromotionPly extends ChessPly {
 		boardChanger.setPieceAt(getTargetX(), getTargetY(), newPiece);
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + "" + newPiece.getRepresentation();
+	}
+
 }
