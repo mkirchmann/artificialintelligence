@@ -18,16 +18,16 @@ public class King extends Piece {
 		// TODO castling
 
 		// simple move.
-		checkPieceAndAddPly(plies, board, x, y, x + 1, y + 1);
-		checkPieceAndAddPly(plies, board, x, y, x + 1, y);
-		checkPieceAndAddPly(plies, board, x, y, x + 1, y - 1);
+		checkPieceAndAddPly(plies, board, x, y, x + 1, y + 1, false);
+		checkPieceAndAddPly(plies, board, x, y, x + 1, y, false);
+		checkPieceAndAddPly(plies, board, x, y, x + 1, y - 1, false);
 
-		checkPieceAndAddPly(plies, board, x, y, x, y + 1);
-		checkPieceAndAddPly(plies, board, x, y, x, y - 1);
+		checkPieceAndAddPly(plies, board, x, y, x, y + 1, false);
+		checkPieceAndAddPly(plies, board, x, y, x, y - 1, false);
 
-		checkPieceAndAddPly(plies, board, x, y, x - 1, y + 1);
-		checkPieceAndAddPly(plies, board, x, y, x - 1, y);
-		checkPieceAndAddPly(plies, board, x, y, x - 1, y - 1);
+		checkPieceAndAddPly(plies, board, x, y, x - 1, y + 1, false);
+		checkPieceAndAddPly(plies, board, x, y, x - 1, y, false);
+		checkPieceAndAddPly(plies, board, x, y, x - 1, y - 1, false);
 
 	}
 

@@ -37,7 +37,7 @@ public class Pawn extends Piece {
 		}
 
 		if (x > board.getMinX()) {
-			checkPieceAndAddPly(plies, board, x, y, x - 1, y + direction);
+			checkPieceAndAddPly(plies, board, x, y, x - 1, y + direction, false);
 		}
 		if (x < board.getMaxX()) {
 			final int newX = x + 1;
@@ -51,7 +51,7 @@ public class Pawn extends Piece {
 		// en passant.
 		final ChessPly lastPly = board.getLastPly();
 
-		if (lastPly.getPiece() instanceof Pawn) {
+		if (lastPly != null && lastPly.getPiece() instanceof Pawn) {
 			final int steps = Math.abs(lastPly.getSourceY() - lastPly.getTargetY());
 			if (lastPly.getTargetY() == y && y == enPassantLine && steps == 2) {
 				if (lastPly.getTargetX() == x - 1) {
@@ -64,6 +64,10 @@ public class Pawn extends Piece {
 
 		for (int i = 0; i < 2; i++) {
 			final int newY = i * direction + direction;
+			final boolean valid = board.checkCoordinatesValid(x, newY);
+			if (!valid) {
+				break;
+			}
 			final Piece pieceAt = board.getPieceAt(x, newY);
 			if (pieceAt == null) { // ok.
 				final boolean capture = false;

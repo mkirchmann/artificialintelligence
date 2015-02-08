@@ -176,7 +176,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 		for (int y = 0; y < 8; y++) {
 			for (int x = 0; x < 8; x++) {
 				final Piece piece = boardContents[y][x];
-				if (piece.getRepresentation() == 'K' && piece.getColor() == color) {
+				if (piece != null && piece.getRepresentation() == 'K' && piece.getColor() == color) {
 					// found king.
 					return isAttackedByOpponent(x, y, color);
 				}

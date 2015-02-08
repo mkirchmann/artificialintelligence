@@ -16,28 +16,28 @@ public class Rook extends Piece {
 	public void addPossiblePlies(final List<ChessPly> plies, final Board<Piece, Color, ChessPly> board, final int x,
 			final int y, final boolean checkSaveness) {
 		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x + i, y);
+			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x + i, y, false);
 			if (doBreak) {
 				break;
 			}
 		}
 
 		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x - i, y);
+			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x - i, y, false);
 			if (doBreak) {
 				break;
 			}
 		}
 
 		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x, y - 1);
+			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x, y - 1, false);
 			if (doBreak) {
 				break;
 			}
 		}
 
 		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x, y + 1);
+			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x, y + 1, false);
 			if (doBreak) {
 				break;
 			}

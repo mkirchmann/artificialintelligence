@@ -54,7 +54,7 @@ public abstract class Piece implements Serializable {
 	}
 
 	protected boolean checkPieceAndAddPly(final List<ChessPly> plies, final Board<Piece, Color, ChessPly> board,
-			final int sourceX, final int sourceY, final int newX, final int newY) {
+			final int sourceX, final int sourceY, final int newX, final int newY, final boolean checkOwnKingsafeness) {
 		final boolean doBreak;
 		if (board.checkCoordinatesValid(newX, newY)) {
 			final Piece pieceAt = board.getPieceAt(newX, newY);
@@ -71,8 +71,14 @@ public abstract class Piece implements Serializable {
 				doBreak = true;
 			} else {
 				final ChessPly ply = new ChessPly(this, sourceX, sourceY, newX, newY, false, false);
-				final Board<Piece, Color, ChessPly> targetBoard = board.apply(ply);
-				if (!targetBoard.isInCheck(getColor())) {
+				final boolean valid;
+				if (checkOwnKingsafeness) {
+					final Board<Piece, Color, ChessPly> targetBoard = board.apply(ply);
+					valid = !targetBoard.isInCheck(getColor());
+				} else {
+					valid = true;
+				}
+				if (valid) {
 					plies.add(ply);
 				}
 				doBreak = false;

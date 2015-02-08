@@ -17,28 +17,28 @@ public class Bishop extends Piece {
 			final int y, final boolean checkSaveness) {
 
 		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x + i, y + 1);
+			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x + i, y + 1, false);
 			if (doBreak) {
 				break;
 			}
 		}
 
 		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x - i, y - 1);
+			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x - i, y - 1, false);
 			if (doBreak) {
 				break;
 			}
 		}
 
 		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x + i, y - 1);
+			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x + i, y - 1, false);
 			if (doBreak) {
 				break;
 			}
 		}
 
 		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x - i, y + 1);
+			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x - i, y + 1, false);
 			if (doBreak) {
 				break;
 			}
