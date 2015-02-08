@@ -1,0 +1,117 @@
+package de.neuenberger.ai.impl.chess.model.pieces;
+
+import java.util.List;
+
+import de.neuenberger.ai.base.model.Board;
+import de.neuenberger.ai.impl.chess.model.ChessPly;
+import de.neuenberger.ai.impl.chess.model.Piece;
+import de.neuenberger.ai.impl.chess.model.plies.PromotionPly;
+
+public class Pawn extends Piece {
+
+	private transient Piece[] promotionPieces;
+
+	public Pawn(final Color color) {
+		super('P', color);
+	}
+
+	@Override
+	public void addPossiblePlies(final List<ChessPly> plies, final Board<Piece, Color, ChessPly> board, final int x,
+			final int y, final boolean checkSaveness) {
+		boolean moveTwo;
+		int direction;
+		int enPassantLine;
+		boolean promotion;
+		if (getColor() == Color.WHITE) {
+			moveTwo = y == 1;
+			direction = 1;
+			promotion = y == 6;
+			enPassantLine = 4;
+		} else if (getColor() == Color.BLACK) {
+			moveTwo = y == 6;
+			direction = -1;
+			promotion = y == 1;
+			enPassantLine = 3;
+		} else {
+			throw new IllegalStateException();
+		}
+
+		if (x > board.getMinX()) {
+			checkPieceAndAddPly(plies, board, x, y, x - 1, y + direction);
+		}
+		if (x < board.getMaxX()) {
+			final int newX = x + 1;
+			final int newY = y + direction;
+			final Piece pieceAt = board.getPieceAt(newX, newY);
+			if (pieceAt != null && pieceAt.getColor() != getColor()) {
+				createPlyValidateAndAddToList(board, plies, x, y, promotion, newX, newY, true, false, checkSaveness);
+			}
+		}
+
+		// en passant.
+		final ChessPly lastPly = board.getLastPly();
+
+		if (lastPly.getPiece() instanceof Pawn) {
+			final int steps = Math.abs(lastPly.getSourceY() - lastPly.getTargetY());
+			if (lastPly.getTargetY() == y && y == enPassantLine && steps == 2) {
+				if (lastPly.getTargetX() == x - 1) {
+					// capture en passant to -1
+				} else if (lastPly.getTargetX() == x + 1) {
+					// capture en passant to +1
+				}
+			}
+		}
+
+		for (int i = 0; i < 2; i++) {
+			final int newY = i * direction + direction;
+			final Piece pieceAt = board.getPieceAt(x, newY);
+			if (pieceAt == null) { // ok.
+				final boolean capture = false;
+				final boolean check = false;
+				createPlyValidateAndAddToList(board, plies, x, y, promotion, x, newY, capture, check, checkSaveness);
+			} else {
+				break;
+			}
+			if (!moveTwo) {
+				break;
+			}
+		}
+	}
+
+	private void createPlyValidateAndAddToList(final Board<Piece, Color, ChessPly> board, final List<ChessPly> plies,
+			final int x, final int y, final boolean promotion, final int newX, final int newY, final boolean capture,
+			final boolean check, final boolean checkSaveness) {
+		if (promotion) {
+			final Piece[] promotionPieces = getPromotionPieces();
+			Boolean isCheck = null;
+			for (final Piece piece : promotionPieces) {
+				final PromotionPly ply = new PromotionPly(this, x, y, newX, newY, piece, capture, check);
+				if (isCheck == null) {
+					final Board<Piece, Color, ChessPly> applied = board.apply(ply);
+					isCheck = applied.isInCheck(getColor());
+					// just check once - all the other moves result in a virtual
+					// similar position.
+				}
+				if (isCheck) { // not a valid move.
+					break;
+				} else {
+					plies.add(ply);
+				}
+			}
+		} else {
+			final ChessPly ply = new ChessPly(this, x, y, newX, newY, capture, check);
+			final Board<Piece, Color, ChessPly> applied = board.apply(ply);
+			if (!applied.isInCheck(getColor())) {
+				plies.add(ply);
+			}
+		}
+	}
+
+	private Piece[] getPromotionPieces() {
+		if (promotionPieces == null) {
+			promotionPieces = new Piece[] { new Queen(getColor()), new Rook(getColor()), new Knight(getColor()),
+					new Bishop(getColor()) };
+		}
+		return promotionPieces;
+	}
+}
