@@ -50,7 +50,7 @@ public class Pawn extends Piece {
 		// en passant.
 		final ChessPly lastPly = board.getLastPly();
 
-		if (lastPly != null && lastPly.getPiece() instanceof Pawn) {
+		if (!promotion && lastPly != null && lastPly.getPiece() instanceof Pawn) {
 			final int steps = Math.abs(lastPly.getSourceY() - lastPly.getTargetY());
 			if (lastPly.getTargetY() == y && y == enPassantLine && steps == 2) {
 				if (lastPly.getTargetX() == x - 1) {
@@ -62,7 +62,7 @@ public class Pawn extends Piece {
 		}
 
 		for (int i = 0; i < 2; i++) {
-			final int newY = i * direction + direction;
+			final int newY = y + i * direction + direction;
 			final boolean valid = board.checkCoordinatesValid(x, newY);
 			if (!valid) {
 				break;
@@ -96,6 +96,9 @@ public class Pawn extends Piece {
 		if (promotion) {
 			final Piece[] promotionPieces = getPromotionPieces();
 			Boolean isCheck = null;
+			if (checkSaveness) {
+				isCheck = false;
+			}
 			for (final Piece piece : promotionPieces) {
 				final PromotionPly ply = new PromotionPly(this, x, y, newX, newY, piece, capture, check);
 				if (isCheck == null) {
@@ -112,8 +115,14 @@ public class Pawn extends Piece {
 			}
 		} else {
 			final ChessPly ply = new ChessPly(this, x, y, newX, newY, capture, check);
-			final Board<Piece, Color, ChessPly> applied = board.apply(ply);
-			if (!applied.isInCheck(getColor())) {
+			boolean valid;
+			if (checkSaveness) {
+				final Board<Piece, Color, ChessPly> applied = board.apply(ply);
+				valid = !applied.isInCheck(getColor());
+			} else {
+				valid = true;
+			}
+			if (valid) {
 				plies.add(ply);
 			}
 		}
