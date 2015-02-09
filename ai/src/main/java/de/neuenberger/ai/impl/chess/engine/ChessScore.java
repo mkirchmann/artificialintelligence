@@ -11,10 +11,12 @@ public class ChessScore {
 		for (int x = board.getMinX(); x <= board.getMaxX(); x++) {
 			for (int y = board.getMinY(); y <= board.getMaxY(); y++) {
 				final Piece piece = board.getPieceAt(x, y);
-				if (piece != null && piece.getColor() == color) {
-					ownScore += piece.getSimpleScore();
-				} else {
-					opponentScore += piece.getSimpleScore();
+				if (piece != null) {
+					if (piece.getColor() == color) {
+						ownScore += piece.getSimpleScore();
+					} else {
+						opponentScore += piece.getSimpleScore();
+					}
 				}
 			}
 		}

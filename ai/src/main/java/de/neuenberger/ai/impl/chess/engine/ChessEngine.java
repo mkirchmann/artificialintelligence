@@ -7,7 +7,7 @@ import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
 
-public class Engine {
+public class ChessEngine {
 	ChessScore chessScore = new ChessScore();
 
 	public PlyResult getBestMove(final ChessBoard board, final Color color, final int recursions) {
@@ -40,6 +40,7 @@ public class Engine {
 
 			result = getBestMove(apply, color.getOtherColor(), recursions - 1);
 		}
+		result.insertPly(chessPly);
 		return result;
 	}
 
@@ -61,6 +62,17 @@ public class Engine {
 
 		public void insertPly(final ChessPly ply) {
 			plies.add(0, ply);
+		}
+
+		@Override
+		public String toString() {
+			final StringBuilder builder = new StringBuilder();
+			builder.append("(" + score + ")");
+			for (final ChessPly ply : plies) {
+				builder.append(" ");
+				builder.append(ply);
+			}
+			return builder.toString();
 		}
 	}
 }
