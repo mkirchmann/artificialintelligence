@@ -17,11 +17,24 @@ public class EngineTest {
 
 	@Test
 	public void testBestMove() {
-		final ChessBoard setupByFEN = factory.setupByFEN("6nn/5Prk/6pp/8/8/8/8/7K");
+		final String fen = "6nn/5Prk/6pp/8/8/8/8/7K";
+		final PlyResult bestMove = findBestMove(fen);
+
+		System.out.println(bestMove);
+		Assertions.assertThat(bestMove.getScore()).isSameAs(SpecialScore.MATE);
+	}
+
+	private PlyResult findBestMove(final String fen) {
+		final ChessBoard setupByFEN = factory.setupByFEN(fen);
 		System.out.println(setupByFEN);
 		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, 2);
 		final PlyResult bestMove = engine.getBestMove();
+		return bestMove;
+	}
 
+	@Test
+	public void testBestMove2() {
+		final PlyResult bestMove = findBestMove("6rk/6pp/3N4/8/2n5/2n5/8/K7 w");
 		System.out.println(bestMove);
 		Assertions.assertThat(bestMove.getScore()).isSameAs(SpecialScore.MATE);
 	}

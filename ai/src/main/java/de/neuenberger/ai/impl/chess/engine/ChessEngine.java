@@ -30,9 +30,12 @@ public class ChessEngine {
 
 		if (plies.isEmpty()) {
 			if (board.isCheck()) {
-				result = new PlyResult(SpecialScore.MATED);
+				result = new PlyResult(SpecialScore.MATE);
 			} else {
 				result = new PlyResult(SpecialScore.STALEMATE);
+			}
+			if (color == seekBestMoveFor) {
+				result.negate();
 			}
 		} else {
 			for (final ChessPly chessPly : plies) {
@@ -46,9 +49,7 @@ public class ChessEngine {
 				}
 			}
 		}
-		if (color != seekBestMoveFor) {
-			result.negate();
-		}
+
 		return result;
 	}
 
@@ -58,10 +59,14 @@ public class ChessEngine {
 		if (recursions <= 0) {
 			final int score = chessScore.getBoardScore(color, board);
 			result = new PlyResult(score);
+			if (color != seekBestMoveFor) {
+				result.negate();
+			}
 		} else {
 			final ChessBoard apply = board.apply(chessPly);
 
 			result = getBestMove(apply, color.getOtherColor(), recursions - 1);
+			result.negate();
 		}
 		result.insertPly(chessPly);
 		return result;
