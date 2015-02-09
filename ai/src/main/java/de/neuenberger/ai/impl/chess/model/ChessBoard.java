@@ -10,6 +10,8 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 
 	private final Piece[][] boardContents;
 	private ChessPly lastPly;
+	private boolean check;
+	private Color whosToMove;
 
 	public ChessBoard() {
 		boardContents = new Piece[8][8];
@@ -188,6 +190,35 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 			}
 		}
 
+		@Override
+		public void setWhosToMove(final Color whosToMove) {
+			chessBoard.setWhosToMove(whosToMove);
+
+			chessBoard.check = chessBoard.isInCheck(whosToMove);
+		}
+
+	}
+
+	/**
+	 * @return the check
+	 */
+	public boolean isCheck() {
+		return check;
+	}
+
+	/**
+	 * @return the whosToMove
+	 */
+	public Color getWhosToMove() {
+		return whosToMove;
+	}
+
+	/**
+	 * @param whosToMove
+	 *            the whosToMove to set
+	 */
+	private void setWhosToMove(final Color whosToMove) {
+		this.whosToMove = whosToMove;
 	}
 
 }

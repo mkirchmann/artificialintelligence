@@ -65,9 +65,11 @@ public class ChessBoardFactory {
 
 		private final String fen;
 		private final Map<Character, Piece> pieceMap;
+		private final String parameters;
 
-		public FENSetup(final String fen) {
+		public FENSetup(final String fen, final String parameters) {
 			this.fen = fen;
+			this.parameters = parameters;
 
 			final Map<Character, Piece> char2piece = new HashMap<>();
 			char2piece.put('p', new Pawn(Color.BLACK));
@@ -112,6 +114,18 @@ public class ChessBoardFactory {
 					x++;
 				}
 			}
+
+			Color whosTurnIsIt = Color.WHITE;
+
+			if (parameters != null) {
+				if (parameters.startsWith("b")) {
+					whosTurnIsIt = Color.BLACK;
+				} else if (parameters.startsWith("w")) {
+					whosTurnIsIt = Color.WHITE;
+				}
+			}
+
+			boardChanger.setWhosToMove(whosTurnIsIt);
 		}
 
 	}
@@ -119,9 +133,10 @@ public class ChessBoardFactory {
 	public ChessBoard setupByFEN(final String fen) {
 		final int idxSpace = fen.indexOf(' ');
 		if (idxSpace > 0) {
-			return setupByFEN(fen.substring(0, idxSpace));
+			return chessBoard.apply(new FENSetup(fen.substring(0, idxSpace), fen.substring(idxSpace).trim()));
+		} else {
+			return chessBoard.apply(new FENSetup(fen, null));
 		}
-		return chessBoard.apply(new FENSetup(fen));
 	}
 
 	public ChessBoard createInitalSetup() {

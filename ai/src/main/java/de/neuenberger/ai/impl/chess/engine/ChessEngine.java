@@ -15,15 +15,21 @@ public class ChessEngine {
 
 		final List<ChessPly> plies = board.getPossiblePlies(color);
 
-		final int maxScore = 0;
-
-		for (final ChessPly chessPly : plies) {
-			if (result == null) {
-				result = getScore(board, color, recursions, chessPly);
+		if (plies.isEmpty()) {
+			if (board.isCheck()) {
+				result = new PlyResult(SpecialScore.MATE);
 			} else {
-				final PlyResult currentScore = getScore(board, color, recursions, chessPly);
-				if (currentScore.getScore() > maxScore) {
-					result = currentScore;
+				result = new PlyResult(SpecialScore.STALEMATE);
+			}
+		} else {
+			for (final ChessPly chessPly : plies) {
+				if (result == null) {
+					result = getScore(board, color, recursions, chessPly);
+				} else {
+					final PlyResult currentScore = getScore(board, color, recursions, chessPly);
+					if (result.compareTo(currentScore) > 0) {
+						result = currentScore;
+					}
 				}
 			}
 		}
@@ -44,11 +50,16 @@ public class ChessEngine {
 		return result;
 	}
 
-	static class PlyResult {
-		final int score;
+	static class PlyResult implements Comparable<PlyResult> {
+		final Object score;
 
-		public PlyResult(final int score) {
+		// TODO split to two classes for each score.
+		public PlyResult(final Integer score) {
 			this.score = score;
+		}
+
+		public PlyResult(final SpecialScore specialScore) {
+			this.score = specialScore;
 		}
 
 		List<ChessPly> plies = new LinkedList<>();
@@ -56,7 +67,7 @@ public class ChessEngine {
 		/**
 		 * @return the score
 		 */
-		public int getScore() {
+		public Object getScore() {
 			return score;
 		}
 
@@ -74,5 +85,63 @@ public class ChessEngine {
 			}
 			return builder.toString();
 		}
+
+		@Override
+		public int compareTo(final PlyResult o) {
+			return compare(score, o.score);
+		}
+
+		public int compare(final Object o1, final Object o2) {
+			if (o1 == null) {
+				throw new IllegalArgumentException("o1=null.");
+			}
+			int result;
+
+			if (o1 instanceof Integer) {
+				if (o2 instanceof Integer) {
+					result = ((Integer) o1).compareTo((Integer) o2);
+				} else if (o2 instanceof SpecialScore) {
+					result = -((SpecialScore) o2).compare(o1);
+				} else {
+					throw new IllegalArgumentException("Wrong type for compare: o2=" + o2);
+				}
+			} else if (o1 instanceof SpecialScore) {
+				result = ((SpecialScore) o1).compare(o2);
+			} else {
+				throw new IllegalArgumentException("Wrong type for compare: o1=" + o1 + ", o2=" + o2);
+			}
+
+			return result;
+		}
 	}
+
+	public enum SpecialScore {
+		STALEMATE(0, "Stalement"), MATE(Integer.MAX_VALUE, "#");
+
+		private final Integer internalScore;
+		private final String addition;
+
+		SpecialScore(final Integer internalScore, final String addition) {
+			this.internalScore = internalScore;
+			this.addition = addition;
+		}
+
+		public int compare(final Object o) {
+			int result;
+			if (o instanceof Integer) {
+				result = internalScore.compareTo((Integer) o);
+			} else if (o instanceof SpecialScore) {
+				result = internalScore.compareTo(((SpecialScore) o).internalScore);
+			} else {
+				throw new IllegalArgumentException();
+			}
+			return result;
+		}
+
+		@Override
+		public String toString() {
+			return addition;
+		}
+	}
+
 }
