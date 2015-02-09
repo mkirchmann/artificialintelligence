@@ -9,15 +9,28 @@ import de.neuenberger.ai.impl.chess.model.Piece.Color;
 
 public class ChessEngine {
 	ChessScore chessScore = new ChessScore();
+	private final Color seekBestMoveFor;
+	private final int recursions;
+	private final ChessBoard board;
 
-	public PlyResult getBestMove(final ChessBoard board, final Color color, final int recursions) {
+	public ChessEngine(final ChessBoard board, final Color seekBestMoveFor, final int recursions) {
+		this.board = board;
+		this.seekBestMoveFor = seekBestMoveFor;
+		this.recursions = recursions;
+	}
+
+	public PlyResult getBestMove() {
+		return getBestMove(board, seekBestMoveFor, recursions);
+	}
+
+	protected PlyResult getBestMove(final ChessBoard board, final Color color, final int recursions) {
 		PlyResult result = null;
 
 		final List<ChessPly> plies = board.getPossiblePlies(color);
 
 		if (plies.isEmpty()) {
 			if (board.isCheck()) {
-				result = new PlyResult(SpecialScore.MATE);
+				result = new PlyResult(SpecialScore.MATED);
 			} else {
 				result = new PlyResult(SpecialScore.STALEMATE);
 			}
@@ -33,10 +46,14 @@ public class ChessEngine {
 				}
 			}
 		}
+		if (color != seekBestMoveFor) {
+			result.negate();
+		}
 		return result;
 	}
 
-	public PlyResult getScore(final ChessBoard board, final Color color, final int recursions, final ChessPly chessPly) {
+	protected PlyResult getScore(final ChessBoard board, final Color color, final int recursions,
+			final ChessPly chessPly) {
 		final PlyResult result;
 		if (recursions <= 0) {
 			final int score = chessScore.getBoardScore(color, board);
@@ -51,11 +68,19 @@ public class ChessEngine {
 	}
 
 	static class PlyResult implements Comparable<PlyResult> {
-		final Object score;
+		private Object score;
 
 		// TODO split to two classes for each score.
 		public PlyResult(final Integer score) {
 			this.score = score;
+		}
+
+		public void negate() {
+			if (score instanceof Integer) {
+				score = -((Integer) score);
+			} else if (score instanceof SpecialScore) {
+				score = ((SpecialScore) score).negate();
+			}
 		}
 
 		public PlyResult(final SpecialScore specialScore) {
@@ -116,7 +141,7 @@ public class ChessEngine {
 	}
 
 	public enum SpecialScore {
-		STALEMATE(0, "Stalement"), MATE(Integer.MAX_VALUE, "#");
+		STALEMATE(0, "Stalement"), MATE(Integer.MAX_VALUE, "#"), MATED(Integer.MIN_VALUE, "-#");
 
 		private final Integer internalScore;
 		private final String addition;
@@ -124,6 +149,16 @@ public class ChessEngine {
 		SpecialScore(final Integer internalScore, final String addition) {
 			this.internalScore = internalScore;
 			this.addition = addition;
+		}
+
+		public SpecialScore negate() {
+			if (this == MATE) {
+				return MATED;
+			} else if (this == MATED) {
+				return MATE;
+			}
+
+			return this;
 		}
 
 		public int compare(final Object o) {

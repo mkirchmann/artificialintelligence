@@ -36,10 +36,6 @@ public class ChessBoardTest {
 	@Test
 	public void testMoves() {
 		final List<ChessPly> possiblePlies = chessBoard.getPossiblePlies(Color.WHITE);
-		for (final ChessPly chessPly : possiblePlies) {
-			System.out.println(chessPly);
-
-		}
 		Assertions.assertThat(possiblePlies).hasSize(20);
 	}
 
