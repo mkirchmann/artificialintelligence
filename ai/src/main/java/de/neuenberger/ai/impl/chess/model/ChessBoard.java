@@ -109,6 +109,8 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 
 	@Override
 	public boolean isAttackedByOpponent(final int targetX, final int targetY, final Color color) {
+		// TODO improve by checking only rook, bishop , knight and king moves,
+		// i.e. whether these can capture the target coordinates ...
 		final List<ChessPly> tempList = new LinkedList<>();
 		for (int y = 0; y < 8; y++) {
 			for (int x = 0; x < 8; x++) {

@@ -36,6 +36,6 @@ public class EngineTest {
 		final PlyResult bestMove = engine.getBestMove(stalematePosition, Color.WHITE, 1);
 
 		Assertions.assertThat(stalematePosition.isCheck()).isFalse();
-		Assertions.assertThat(bestMove.getScore()).isEqualTo(0);
+		Assertions.assertThat(bestMove.getScore()).isSameAs(SpecialScore.STALEMATE);
 	}
 }

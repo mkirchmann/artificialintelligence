@@ -24,21 +24,21 @@ public class Bishop extends Piece {
 		}
 
 		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x - i, y - 1, false);
+			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x - i, y - i, false);
 			if (doBreak) {
 				break;
 			}
 		}
 
 		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x + i, y - 1, false);
+			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x + i, y - i, false);
 			if (doBreak) {
 				break;
 			}
 		}
 
 		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x - i, y + 1, false);
+			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x - i, y + i, false);
 			if (doBreak) {
 				break;
 			}
