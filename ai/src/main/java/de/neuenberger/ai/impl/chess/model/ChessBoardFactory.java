@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.neuenberger.ai.impl.chess.model.ChessBoard.BoardChangerImpl;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
 import de.neuenberger.ai.impl.chess.model.pieces.Bishop;
 import de.neuenberger.ai.impl.chess.model.pieces.King;
@@ -24,7 +23,7 @@ public class ChessBoardFactory {
 	public static class BoardInitialSetup implements ChessBoardModifier {
 
 		@Override
-		public void applyTo(final BoardChangerImpl boardChanger) {
+		public void applyTo(final BoardChanger boardChanger) {
 			final Pawn blackPawn = new Pawn(Color.BLACK);
 			final Pawn whitePawn = new Pawn(Color.WHITE);
 			for (int i = 0; i < 8; i++) {
@@ -59,6 +58,11 @@ public class ChessBoardFactory {
 			boardChanger.setPieceAt(4, 7, new King(Color.BLACK));
 		}
 
+		@Override
+		public void applyWhosToMove(final BoardChanger boardChanger) {
+			boardChanger.setWhosToMove(Color.WHITE);
+		}
+
 	}
 
 	private static class FENSetup implements ChessBoardModifier {
@@ -88,7 +92,7 @@ public class ChessBoardFactory {
 		}
 
 		@Override
-		public void applyTo(final BoardChangerImpl boardChanger) {
+		public void applyTo(final BoardChanger boardChanger) {
 			final String[] split = fen.split("/");
 			if (split.length != 8) {
 				throw new IllegalArgumentException("Illegal fen: '" + fen + "'");
@@ -114,7 +118,10 @@ public class ChessBoardFactory {
 					x++;
 				}
 			}
+		}
 
+		@Override
+		public void applyWhosToMove(final BoardChanger boardChanger) {
 			Color whosTurnIsIt = Color.WHITE;
 
 			if (parameters != null) {

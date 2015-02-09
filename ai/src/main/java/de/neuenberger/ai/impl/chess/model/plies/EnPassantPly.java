@@ -1,6 +1,6 @@
 package de.neuenberger.ai.impl.chess.model.plies;
 
-import de.neuenberger.ai.impl.chess.model.ChessBoard.BoardChangerImpl;
+import de.neuenberger.ai.impl.chess.model.BoardChanger;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
 
@@ -15,7 +15,7 @@ public class EnPassantPly extends ChessPly {
 	}
 
 	@Override
-	public void applyTo(final BoardChangerImpl boardChanger) {
+	public void applyTo(final BoardChanger boardChanger) {
 		super.applyTo(boardChanger);
 		boardChanger.setPieceAt(getTargetX(), otherPawnY, null);
 	}

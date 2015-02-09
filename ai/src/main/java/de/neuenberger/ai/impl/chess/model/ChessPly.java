@@ -1,6 +1,5 @@
 package de.neuenberger.ai.impl.chess.model;
 
-import de.neuenberger.ai.impl.chess.model.ChessBoard.BoardChangerImpl;
 import de.neuenberger.ai.impl.chess.model.pieces.Pawn;
 
 /**
@@ -85,8 +84,13 @@ public class ChessPly implements ChessBoardModifier {
 	 *            only be used within this call.
 	 */
 	@Override
-	public void applyTo(final BoardChangerImpl boardChanger) {
+	public void applyTo(final BoardChanger boardChanger) {
 		boardChanger.movePiece(sourceX, sourceY, targetX, targetY);
+	}
+
+	@Override
+	public void applyWhosToMove(final BoardChanger boardChanger) {
+		boardChanger.setWhosToMove(piece.getColor().getOtherColor());
 	}
 
 	@Override

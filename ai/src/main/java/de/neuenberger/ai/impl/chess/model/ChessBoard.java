@@ -61,6 +61,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 			}
 			builder.append("\n");
 		}
+		builder.append(whosToMove).append(" to move");
 		return builder.toString();
 	}
 
@@ -96,6 +97,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 		}
 		final BoardChangerImpl boardChanger = clone.createBoardChanger();
 		p.applyTo(boardChanger);
+		p.applyWhosToMove(boardChanger);
 		boardChanger.invalidate();
 
 		return clone;
@@ -195,6 +197,8 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 			chessBoard.setWhosToMove(whosToMove);
 
 			chessBoard.check = chessBoard.isInCheck(whosToMove);
+
+			invalidate();
 		}
 
 	}

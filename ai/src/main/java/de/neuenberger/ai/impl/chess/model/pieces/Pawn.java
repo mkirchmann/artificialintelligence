@@ -96,7 +96,7 @@ public class Pawn extends Piece {
 		if (promotion) {
 			final Piece[] promotionPieces = getPromotionPieces();
 			Boolean isCheck = null;
-			if (checkSaveness) {
+			if (!checkSaveness) {
 				isCheck = false;
 			}
 			for (final Piece piece : promotionPieces) {

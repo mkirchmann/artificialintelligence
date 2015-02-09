@@ -25,7 +25,7 @@ public class ChessBoardTest {
 		final String string = chessBoard.toString();
 
 		Assertions.assertThat(string).startsWith("rnbqkbnr\npppppppp\n");
-		Assertions.assertThat(string).endsWith("PPPPPPPP\nRNBQKBNR\n");
+		Assertions.assertThat(string).endsWith("PPPPPPPP\nRNBQKBNR\nWHITE to move");
 	}
 
 	@Test
