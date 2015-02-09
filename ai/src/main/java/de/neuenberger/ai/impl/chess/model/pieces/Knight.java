@@ -16,15 +16,15 @@ public class Knight extends Piece {
 	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final int x, final int y,
 			final boolean checkSaveness) {
 
-		checkPieceAndAddPly(plies, board, x, y, x + 1, y + 2, false);
-		checkPieceAndAddPly(plies, board, x, y, x + 1, y - 2, false);
-		checkPieceAndAddPly(plies, board, x, y, x - 1, y + 2, false);
-		checkPieceAndAddPly(plies, board, x, y, x - 1, y - 2, false);
+		checkPieceAndAddPly(plies, board, x, y, x + 1, y + 2, checkSaveness);
+		checkPieceAndAddPly(plies, board, x, y, x + 1, y - 2, checkSaveness);
+		checkPieceAndAddPly(plies, board, x, y, x - 1, y + 2, checkSaveness);
+		checkPieceAndAddPly(plies, board, x, y, x - 1, y - 2, checkSaveness);
 
-		checkPieceAndAddPly(plies, board, x, y, x + 2, y + 1, false);
-		checkPieceAndAddPly(plies, board, x, y, x - 2, y + 1, false);
-		checkPieceAndAddPly(plies, board, x, y, x + 2, y - 1, false);
-		checkPieceAndAddPly(plies, board, x, y, x - 2, y - 1, false);
+		checkPieceAndAddPly(plies, board, x, y, x + 2, y + 1, checkSaveness);
+		checkPieceAndAddPly(plies, board, x, y, x - 2, y + 1, checkSaveness);
+		checkPieceAndAddPly(plies, board, x, y, x + 2, y - 1, checkSaveness);
+		checkPieceAndAddPly(plies, board, x, y, x - 2, y - 1, checkSaveness);
 
 	}
 

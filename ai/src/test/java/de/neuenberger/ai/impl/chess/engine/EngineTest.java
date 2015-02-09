@@ -1,5 +1,7 @@
 package de.neuenberger.ai.impl.chess.engine;
 
+import java.util.List;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
@@ -7,6 +9,7 @@ import de.neuenberger.ai.impl.chess.engine.ChessEngine.PlyResult;
 import de.neuenberger.ai.impl.chess.engine.ChessEngine.SpecialScore;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessBoardFactory;
+import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
 
 public class EngineTest {
@@ -32,6 +35,8 @@ public class EngineTest {
 	private void noMoveWhenMated(final String fen, final Color color) {
 		final ChessBoard setupByFEN = factory.setupByFEN(fen);
 		Assertions.assertThat(setupByFEN.isCheck()).isTrue();
+		final List<ChessPly> possiblePlies = setupByFEN.getPossiblePlies(color);
+		Assertions.assertThat(possiblePlies).isEmpty();
 		final ChessEngine engine = new ChessEngine(setupByFEN, color, 2);
 		final PlyResult bestMove = engine.getBestMove();
 		Assertions.assertThat(bestMove.getScore()).isSameAs(SpecialScore.MATED);
