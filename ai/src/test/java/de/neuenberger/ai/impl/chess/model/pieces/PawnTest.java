@@ -7,11 +7,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
+import de.neuenberger.ai.impl.chess.model.ChessBoardFactory;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
 
 public class PawnTest {
-	ChessBoard chessBoard = ChessBoard.createInitialChessBoard();
+	ChessBoard chessBoard = new ChessBoardFactory().createInitalSetup();
 
 	@Test
 	public void test() {

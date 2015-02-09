@@ -3,6 +3,7 @@ package de.neuenberger.ai.impl.chess.model.pieces;
 import java.util.List;
 
 import de.neuenberger.ai.base.model.Board;
+import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
 import de.neuenberger.ai.impl.chess.model.plies.PromotionPly;
@@ -12,12 +13,12 @@ public class Pawn extends Piece {
 	private transient Piece[] promotionPieces;
 
 	public Pawn(final Color color) {
-		super('P', color);
+		super('P', color, 10);
 	}
 
 	@Override
-	public void addPossiblePlies(final List<ChessPly> plies, final Board<Piece, Color, ChessPly> board, final int x,
-			final int y, final boolean checkSaveness) {
+	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final int x, final int y,
+			final boolean checkSaveness) {
 		boolean moveTwo;
 		int direction;
 		int enPassantLine;
@@ -81,17 +82,16 @@ public class Pawn extends Piece {
 		}
 	}
 
-	private void checkIfIsCaptureAndIfSoAdd(final List<ChessPly> plies, final Board<Piece, Color, ChessPly> board,
-			final int x, final int y, final boolean checkSaveness, final boolean promotion, final int newX,
-			final int newY) {
+	private void checkIfIsCaptureAndIfSoAdd(final List<ChessPly> plies, final ChessBoard board, final int x,
+			final int y, final boolean checkSaveness, final boolean promotion, final int newX, final int newY) {
 		final Piece pieceAt = board.getPieceAt(newX, newY);
 		if (pieceAt != null && pieceAt.getColor() != getColor()) {
 			createPlyValidateAndAddToList(board, plies, x, y, promotion, newX, newY, true, false, checkSaveness);
 		}
 	}
 
-	private void createPlyValidateAndAddToList(final Board<Piece, Color, ChessPly> board, final List<ChessPly> plies,
-			final int x, final int y, final boolean promotion, final int newX, final int newY, final boolean capture,
+	private void createPlyValidateAndAddToList(final ChessBoard board, final List<ChessPly> plies, final int x,
+			final int y, final boolean promotion, final int newX, final int newY, final boolean capture,
 			final boolean check, final boolean checkSaveness) {
 		if (promotion) {
 			final Piece[] promotionPieces = getPromotionPieces();
@@ -102,7 +102,7 @@ public class Pawn extends Piece {
 			for (final Piece piece : promotionPieces) {
 				final PromotionPly ply = new PromotionPly(this, x, y, newX, newY, piece, capture, check);
 				if (isCheck == null) {
-					final Board<Piece, Color, ChessPly> applied = board.apply(ply);
+					final ChessBoard applied = board.apply(ply);
 					isCheck = applied.isInCheck(getColor());
 					// just check once - all the other moves result in a virtual
 					// similar position.

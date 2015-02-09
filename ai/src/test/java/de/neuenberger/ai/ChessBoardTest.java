@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
+import de.neuenberger.ai.impl.chess.model.ChessBoardFactory;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
 
@@ -16,7 +17,7 @@ public class ChessBoardTest {
 
 	@Before
 	public void before() {
-		chessBoard = ChessBoard.createInitialChessBoard();
+		chessBoard = new ChessBoardFactory().createInitalSetup();
 	}
 
 	@Test

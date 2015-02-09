@@ -1,6 +1,5 @@
 package de.neuenberger.ai.impl.chess.model;
 
-import de.neuenberger.ai.base.model.Ply;
 import de.neuenberger.ai.impl.chess.model.ChessBoard.BoardChangerImpl;
 import de.neuenberger.ai.impl.chess.model.pieces.Pawn;
 
@@ -10,13 +9,13 @@ import de.neuenberger.ai.impl.chess.model.pieces.Pawn;
  * @author Michael
  * 
  */
-public class ChessPly implements Ply {
+public class ChessPly implements ChessBoardModifier {
 	private final int sourceX;
 	private final int sourceY;
 	private final int targetX;
 	private final int targetY;
 	private final boolean capture;
-	private final boolean check;
+	private boolean check;
 	private final Piece piece;
 
 	public ChessPly(final Piece piece, final int sourceX, final int sourceY, final int targetX, final int targetY,
@@ -85,6 +84,7 @@ public class ChessPly implements Ply {
 	 *            the board changer. This reference may not be kept. It must
 	 *            only be used within this call.
 	 */
+	@Override
 	public void applyTo(final BoardChangerImpl boardChanger) {
 		boardChanger.movePiece(sourceX, sourceY, targetX, targetY);
 	}
@@ -107,5 +107,13 @@ public class ChessPly implements Ply {
 		builder.append((char) ('a' + targetX));
 		builder.append((char) ('1' + targetY));
 		return builder.toString();
+	}
+
+	/**
+	 * @param check
+	 *            the check to set
+	 */
+	public void setCheck(final boolean check) {
+		this.check = check;
 	}
 }

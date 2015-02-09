@@ -5,12 +5,6 @@ import java.util.List;
 
 import de.neuenberger.ai.base.model.Board;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
-import de.neuenberger.ai.impl.chess.model.pieces.Bishop;
-import de.neuenberger.ai.impl.chess.model.pieces.King;
-import de.neuenberger.ai.impl.chess.model.pieces.Knight;
-import de.neuenberger.ai.impl.chess.model.pieces.Pawn;
-import de.neuenberger.ai.impl.chess.model.pieces.Queen;
-import de.neuenberger.ai.impl.chess.model.pieces.Rook;
 
 public class ChessBoard implements Board<Piece, Color, ChessPly> {
 
@@ -93,53 +87,16 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 		return 0;
 	}
 
-	@Override
-	public Board<Piece, Color, ChessPly> apply(final ChessPly p) {
+	public ChessBoard apply(final ChessBoardModifier p) {
 		final ChessBoard clone = clone();
-		clone.lastPly = p;
+		if (p instanceof ChessPly) {
+			clone.lastPly = (ChessPly) p;
+		}
 		final BoardChangerImpl boardChanger = clone.createBoardChanger();
 		p.applyTo(boardChanger);
 		boardChanger.invalidate();
 
 		return clone;
-	}
-
-	public static ChessBoard createInitialChessBoard() {
-		final ChessBoard chessBoard = new ChessBoard();
-		final Pawn blackPawn = new Pawn(Color.BLACK);
-		final Pawn whitePawn = new Pawn(Color.WHITE);
-		for (int i = 0; i < 8; i++) {
-			chessBoard.boardContents[1][i] = whitePawn;
-			chessBoard.boardContents[6][i] = blackPawn;
-		}
-
-		final Rook blackRook = new Rook(Color.BLACK);
-		final Rook whiteRook = new Rook(Color.WHITE);
-		chessBoard.boardContents[0][0] = whiteRook;
-		chessBoard.boardContents[0][7] = whiteRook;
-		chessBoard.boardContents[7][0] = blackRook;
-		chessBoard.boardContents[7][7] = blackRook;
-
-		final Piece whiteKnight = new Knight(Color.WHITE);
-		final Piece blackKnight = new Knight(Color.BLACK);
-		chessBoard.boardContents[0][1] = whiteKnight;
-		chessBoard.boardContents[0][6] = whiteKnight;
-		chessBoard.boardContents[7][1] = blackKnight;
-		chessBoard.boardContents[7][6] = blackKnight;
-
-		final Piece whiteBishop = new Bishop(Color.WHITE);
-		final Piece blackBishop = new Bishop(Color.BLACK);
-		chessBoard.boardContents[0][2] = whiteBishop;
-		chessBoard.boardContents[0][5] = whiteBishop;
-		chessBoard.boardContents[7][2] = blackBishop;
-		chessBoard.boardContents[7][5] = blackBishop;
-
-		chessBoard.boardContents[0][3] = new Queen(Color.WHITE);
-		chessBoard.boardContents[7][3] = new Queen(Color.BLACK);
-		chessBoard.boardContents[0][4] = new King(Color.WHITE);
-		chessBoard.boardContents[7][4] = new King(Color.BLACK);
-
-		return chessBoard;
 	}
 
 	private BoardChangerImpl createBoardChanger() {

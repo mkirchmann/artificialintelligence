@@ -2,19 +2,19 @@ package de.neuenberger.ai.impl.chess.model.pieces;
 
 import java.util.List;
 
-import de.neuenberger.ai.base.model.Board;
+import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
 
 public class King extends Piece {
 
 	public King(final Color color) {
-		super('K', color);
+		super('K', color, 100000);
 	}
 
 	@Override
-	public void addPossiblePlies(final List<ChessPly> plies, final Board<Piece, Color, ChessPly> board, final int x,
-			final int y, final boolean checkSaveness) {
+	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final int x, final int y,
+			final boolean checkSaveness) {
 		// TODO castling
 
 		// simple move.

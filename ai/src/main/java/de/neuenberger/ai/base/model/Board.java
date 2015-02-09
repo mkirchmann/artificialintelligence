@@ -17,7 +17,7 @@ public interface Board<O, C, P extends Ply> {
 
 	int getMinY();
 
-	Board<O, C, P> apply(P p);
+	// Board<O, C, P> apply(P p);
 
 	boolean isAttackedByOpponent(int x, int y, Color color);
 

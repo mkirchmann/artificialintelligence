@@ -3,8 +3,6 @@ package de.neuenberger.ai.impl.chess.model;
 import java.io.Serializable;
 import java.util.List;
 
-import de.neuenberger.ai.base.model.Board;
-
 /**
  * A piece is immutable and can generate moves.
  * 
@@ -15,18 +13,30 @@ public abstract class Piece implements Serializable {
 
 	private final char representation;
 	private final Color color;
+	private final int simpleScore;
 
 	public enum Color {
 		BLACK, WHITE;
+
+		/**
+		 * @return the nextColor
+		 */
+		public Color getOtherColor() {
+			if (this == BLACK) {
+				return WHITE;
+			} else {
+				return BLACK;
+			}
+		}
 	}
 
-	public Piece(final char representation, final Color color) {
+	public Piece(final char representation, final Color color, final int simpleScore) {
 		this.representation = representation;
 		this.color = color;
+		this.simpleScore = simpleScore;
 	}
 
-	public abstract void addPossiblePlies(List<ChessPly> plies, Board<Piece, Color, ChessPly> board, int x, int y,
-			boolean checkSaveness);
+	public abstract void addPossiblePlies(List<ChessPly> plies, ChessBoard board, int x, int y, boolean checkSaveness);
 
 	@Override
 	public String toString() {
@@ -53,8 +63,8 @@ public abstract class Piece implements Serializable {
 		return color;
 	}
 
-	protected boolean checkPieceAndAddPly(final List<ChessPly> plies, final Board<Piece, Color, ChessPly> board,
-			final int sourceX, final int sourceY, final int newX, final int newY, final boolean checkOwnKingsafeness) {
+	protected boolean checkPieceAndAddPly(final List<ChessPly> plies, final ChessBoard board, final int sourceX,
+			final int sourceY, final int newX, final int newY, final boolean checkOwnKingsafeness) {
 		final boolean doBreak;
 		if (board.checkCoordinatesValid(newX, newY)) {
 			final Piece pieceAt = board.getPieceAt(newX, newY);
@@ -63,29 +73,39 @@ public abstract class Piece implements Serializable {
 														// is a
 														// capture move.
 					final ChessPly ply = new ChessPly(this, sourceX, sourceY, newX, newY, true, false);
-					final Board<Piece, Color, ChessPly> targetBoard = board.apply(ply);
-					if (!targetBoard.isInCheck(getColor())) {
-						plies.add(ply);
-					}
+					checkValidityOfPlyAndAdd(plies, board, checkOwnKingsafeness, ply);
 				}
 				doBreak = true;
 			} else {
 				final ChessPly ply = new ChessPly(this, sourceX, sourceY, newX, newY, false, false);
-				final boolean valid;
-				if (checkOwnKingsafeness) {
-					final Board<Piece, Color, ChessPly> targetBoard = board.apply(ply);
-					valid = !targetBoard.isInCheck(getColor());
-				} else {
-					valid = true;
-				}
-				if (valid) {
-					plies.add(ply);
-				}
+				checkValidityOfPlyAndAdd(plies, board, checkOwnKingsafeness, ply);
 				doBreak = false;
 			}
 		} else {
 			doBreak = true;
 		}
 		return doBreak;
+	}
+
+	private void checkValidityOfPlyAndAdd(final List<ChessPly> plies, final ChessBoard board,
+			final boolean checkOwnKingsafeness, final ChessPly ply) {
+		final boolean add;
+		if (checkOwnKingsafeness) {
+			final ChessBoard targetBoard = board.apply(ply);
+			add = !targetBoard.isInCheck(getColor());
+			ply.setCheck(targetBoard.isInCheck(getColor().getOtherColor()));
+		} else {
+			add = true;
+		}
+		if (add) {
+			plies.add(ply);
+		}
+	}
+
+	/**
+	 * @return the simpleScore
+	 */
+	public int getSimpleScore() {
+		return simpleScore;
 	}
 }
