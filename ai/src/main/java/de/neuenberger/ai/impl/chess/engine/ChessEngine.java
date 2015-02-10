@@ -19,32 +19,31 @@ public class ChessEngine {
 	}
 
 	public PlyResult getBestMove() {
-		return getBestMove(board, seekBestMoveFor, recursions);
+		final PlyResult result = getBestMove(board, seekBestMoveFor, recursions, false);
+		result.negate();
+		return result;
 	}
 
-	protected PlyResult getBestMove(final ChessBoard board, final Color color, final int recursions) {
+	protected PlyResult getBestMove(final ChessBoard board, final Color color, final int recursions,
+			final boolean negate) {
 		PlyResult result = null;
 
 		final List<ChessPly> plies = board.getPossiblePlies(color);
 
 		if (plies.isEmpty()) {
 			if (board.isCheck()) {
-				result = new SpecialScorePlyResult(SpecialScore.MATE);
+				result = new SpecialScorePlyResult(SpecialScore.MATED);
 			} else {
 				result = new SpecialScorePlyResult(SpecialScore.STALEMATE);
 			}
-			if (color == seekBestMoveFor) {
+			if (negate) {
 				result.negate();
 			}
 		} else {
 			for (final ChessPly chessPly : plies) {
-				if (result == null) {
-					result = getScore(board, color, recursions, chessPly);
-				} else {
-					final PlyResult currentScore = getScore(board, color, recursions, chessPly);
-					if (result.compareTo(currentScore) > 0) {
-						result = currentScore;
-					}
+				final PlyResult currentScore = getScore(board, color, recursions, chessPly, negate);
+				if (result == null || result.compareTo(currentScore) > 0) {
+					result = currentScore;
 				}
 			}
 		}
@@ -53,18 +52,18 @@ public class ChessEngine {
 	}
 
 	protected PlyResult getScore(final ChessBoard board, final Color color, final int recursions,
-			final ChessPly chessPly) {
+			final ChessPly chessPly, final boolean negate) {
 		final PlyResult result;
 		if (recursions <= 0) {
 			final int score = chessScore.getBoardScore(color, board);
 			result = new IntegerScorePlyResult(score);
-			if (color != seekBestMoveFor) {
+			if (negate) {
 				result.negate();
 			}
 		} else {
 			final ChessBoard apply = board.apply(chessPly);
 
-			result = getBestMove(apply, color.getOtherColor(), recursions - 1);
+			result = getBestMove(apply, color.getOtherColor(), recursions - 1, !negate);
 			result.negate();
 		}
 		result.insertPly(chessPly);
