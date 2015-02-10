@@ -5,7 +5,6 @@ import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
-import de.neuenberger.ai.impl.chess.engine.ChessEngine.PlyResult;
 import de.neuenberger.ai.impl.chess.engine.ChessEngine.SpecialScore;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessBoardFactory;
