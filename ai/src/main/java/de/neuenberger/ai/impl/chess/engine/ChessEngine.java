@@ -36,7 +36,11 @@ public class ChessEngine {
 
 		if (plies.isEmpty()) {
 			if (board.isCheck()) {
-				result = new TerminationScorePlyResult(TerminationScore.MATE, board);
+				if (color == seekBestMoveFor) {
+					result = new TerminationScorePlyResult(TerminationScore.MATED, board);
+				} else {
+					result = new TerminationScorePlyResult(TerminationScore.MATE, board);
+				}
 			} else {
 				result = new TerminationScorePlyResult(TerminationScore.STALEMATE, board);
 			}

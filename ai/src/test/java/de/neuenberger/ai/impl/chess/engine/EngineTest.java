@@ -77,7 +77,7 @@ public class EngineTest {
 		final ChessEngine engine = new ChessEngine(setupByFEN, color, 2);
 		final PlyResult bestMove = engine.getBestMove();
 		System.out.println(bestMove.getTargetBoard());
-		Assertions.assertThat(bestMove.getScore()).isSameAs(TerminationScore.MATE);
+		Assertions.assertThat(bestMove.getScore()).isSameAs(TerminationScore.MATED);
 	}
 
 	@Test
@@ -125,6 +125,24 @@ public class EngineTest {
 		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, 5);
 		final PlyResult bestMove = engine.getBestMove();
 		Assertions.assertThat(bestMove.toString()).isEqualTo("(#) Bg5-f6 Kf8-g8 Rd1-d8 Kg8-h2 Rd8-h8");
+	}
+
+	@Test
+	public void testBestMoveMateIn3CombinationOfBishopAndRook_TakeLongestVariant() {
+		final String fen = "5k2/5p2/5Bp1/8/8/8/8/3R3K b";
+		final ChessBoard setupByFEN = factory.setupByFEN(fen);
+		final ChessEngine engine = new ChessEngine(setupByFEN, Color.BLACK, 4);
+		final PlyResult bestMove = engine.getBestMove();
+		Assertions.assertThat(bestMove.toString()).isEqualTo("(-#) Kf8-g8 Rd1-d8 Kg8-h7 Rd8-h8");
+	}
+
+	@Test
+	public void testRookBaselineMate() throws Exception {
+		final String fen = "5k2/5p2/5B2/8/8/8/8/3R3K w";
+		final ChessBoard setupByFEN = factory.setupByFEN(fen);
+		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, 2);
+		final PlyResult bestMove = engine.getBestMove();
+		Assertions.assertThat(bestMove.toString()).isEqualTo("(#) Rd1-d8");
 	}
 
 	@Ignore
