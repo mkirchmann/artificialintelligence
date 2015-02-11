@@ -16,8 +16,6 @@ public abstract class PlyResult<ScoreType> implements Comparable<PlyResult> {
 		this.targetBoard = targetBoard;
 	}
 
-	public abstract void negate();
-
 	List<ChessPly> plies = new LinkedList<>();
 
 	/**
@@ -49,6 +47,14 @@ public abstract class PlyResult<ScoreType> implements Comparable<PlyResult> {
 	 */
 	public ChessBoard getTargetBoard() {
 		return targetBoard;
+	}
+
+	/**
+	 * 
+	 * @return Return number of plies.
+	 */
+	public int getPlyCount() {
+		return plies.size();
 	}
 
 }

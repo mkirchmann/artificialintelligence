@@ -36,12 +36,15 @@ public class ChessEngine {
 
 		if (plies.isEmpty()) {
 			if (board.isCheck()) {
-				result = new SpecialScorePlyResult(SpecialScore.MATE, board);
+				result = new SpecialScorePlyResult(TerminationScore.MATE, board);
 			} else {
-				result = new SpecialScorePlyResult(SpecialScore.STALEMATE, board);
+				result = new SpecialScorePlyResult(TerminationScore.STALEMATE, board);
 			}
 		} else {
 			for (final ChessPly chessPly : plies) {
+				if (putLog) {
+					log.info("about to check " + chessPly);
+				}
 				final PlyResult currentScore = getScore(board, color, recursions, chessPly);
 				if (putLog) {
 					log.info("checking move for " + color + " with " + recursions + " recursions resulted in "
@@ -80,49 +83,6 @@ public class ChessEngine {
 		}
 		result.insertPly(chessPly);
 		return result;
-	}
-
-	public enum SpecialScore {
-		STALEMATE(0, "Stalemate"), MATE(Integer.MAX_VALUE, "#"), MATED(Integer.MIN_VALUE, "-#");
-
-		private final Integer internalScore;
-		private final String addition;
-
-		SpecialScore(final Integer internalScore, final String addition) {
-			this.internalScore = internalScore;
-			this.addition = addition;
-		}
-
-		public SpecialScore negate() {
-			if (this == MATE) {
-				return MATED;
-			} else if (this == MATED) {
-				return MATE;
-			}
-
-			return this;
-		}
-
-		public int compare(final Object o) {
-			int result;
-			if (o instanceof Integer) {
-				result = internalScore.compareTo((Integer) o);
-			} else if (o instanceof SpecialScore) {
-				result = internalScore.compareTo(((SpecialScore) o).internalScore);
-			} else {
-				throw new IllegalArgumentException();
-			}
-			return result;
-		}
-
-		@Override
-		public String toString() {
-			return addition;
-		}
-
-		public int getScoreEquivalent() {
-			return internalScore;
-		}
 	}
 
 }

@@ -1,22 +1,20 @@
 package de.neuenberger.ai.impl.chess.engine;
 
-import de.neuenberger.ai.impl.chess.engine.ChessEngine.SpecialScore;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 
-public class SpecialScorePlyResult extends PlyResult<SpecialScore> {
+public class SpecialScorePlyResult extends PlyResult<TerminationScore> {
 
-	public SpecialScorePlyResult(final SpecialScore specialScore, final ChessBoard board) {
+	public SpecialScorePlyResult(final TerminationScore specialScore, final ChessBoard board) {
 		super(specialScore, board);
 	}
 
 	@Override
-	public void negate() {
-		score = score.negate();
-	}
-
-	@Override
 	public int compareTo(final PlyResult o) {
-		return score.compare(o.getScore());
+		int result = score.compare(o.getScore());
+		if (result == 0) {
+			result = Integer.valueOf(getPlyCount()).compareTo(o.getPlyCount());
+		}
+		return result;
 	}
 
 	@Override

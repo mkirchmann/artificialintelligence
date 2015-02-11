@@ -15,6 +15,21 @@ public class BasePiecePlyFactory {
 
 	}
 
+	/**
+	 * 
+	 * @param plies
+	 * @param board
+	 * @param sourceX
+	 *            source coordinate x
+	 * @param sourceY
+	 *            source coordinate y
+	 * @param newX
+	 *            target coordinate x
+	 * @param newY
+	 *            target coordinate y
+	 * @param checkOwnKingsafeness
+	 * @return Returns true if there was any piece.
+	 */
 	public boolean checkPieceAndAddPly(final List<ChessPly> plies, final ChessBoard board, final int sourceX,
 			final int sourceY, final int newX, final int newY, final boolean checkOwnKingsafeness) {
 		final boolean doBreak;

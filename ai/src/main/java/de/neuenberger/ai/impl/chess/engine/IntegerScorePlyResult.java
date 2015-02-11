@@ -9,11 +9,6 @@ public class IntegerScorePlyResult extends PlyResult<Integer> {
 	}
 
 	@Override
-	public void negate() {
-		score = -((Integer) score);
-	}
-
-	@Override
 	public int getScoreEquivalent() {
 		return getScore();
 	}

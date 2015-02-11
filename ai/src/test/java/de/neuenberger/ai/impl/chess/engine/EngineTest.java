@@ -7,7 +7,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.neuenberger.ai.impl.chess.engine.ChessEngine.SpecialScore;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessBoardFactory;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
@@ -22,7 +21,7 @@ public class EngineTest {
 		final PlyResult bestMove = findBestMove(fen);
 		System.out.println(bestMove.getTargetBoard());
 		System.out.println(bestMove);
-		Assertions.assertThat(bestMove.getScore()).isSameAs(SpecialScore.MATE);
+		Assertions.assertThat(bestMove.getScore()).isSameAs(TerminationScore.MATE);
 		Assertions.assertThat(bestMove.toString()).isEqualTo("(#) f7-f8N");
 	}
 
@@ -40,7 +39,7 @@ public class EngineTest {
 		final PlyResult bestMove = findBestMove("6rk/6pp/3N4/8/2n5/2n5/8/K7 w");
 		System.out.println(bestMove.getTargetBoard());
 		System.out.println(bestMove);
-		Assertions.assertThat(bestMove.getScore()).isSameAs(SpecialScore.MATE);
+		Assertions.assertThat(bestMove.getScore()).isSameAs(TerminationScore.MATE);
 		Assertions.assertThat(bestMove.toString()).isEqualTo("(#) Nd6-f7");
 	}
 
@@ -78,7 +77,7 @@ public class EngineTest {
 		final ChessEngine engine = new ChessEngine(setupByFEN, color, 2);
 		final PlyResult bestMove = engine.getBestMove();
 		System.out.println(bestMove.getTargetBoard());
-		Assertions.assertThat(bestMove.getScore()).isSameAs(SpecialScore.MATE);
+		Assertions.assertThat(bestMove.getScore()).isSameAs(TerminationScore.MATE);
 	}
 
 	@Test
@@ -94,7 +93,7 @@ public class EngineTest {
 		final PlyResult bestMove = engine.getBestMove();
 		System.out.println(bestMove.getTargetBoard());
 		Assertions.assertThat(stalematePosition.isCheck()).isFalse();
-		Assertions.assertThat(bestMove.getScore()).isSameAs(SpecialScore.STALEMATE);
+		Assertions.assertThat(bestMove.getScore()).isSameAs(TerminationScore.STALEMATE);
 	}
 
 	@Test
