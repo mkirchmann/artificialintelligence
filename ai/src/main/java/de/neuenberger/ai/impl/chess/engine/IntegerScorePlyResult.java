@@ -1,9 +1,11 @@
 package de.neuenberger.ai.impl.chess.engine;
 
+import de.neuenberger.ai.impl.chess.model.ChessBoard;
+
 public class IntegerScorePlyResult extends PlyResult<Integer> {
 
-	public IntegerScorePlyResult(final Integer score) {
-		super(score);
+	public IntegerScorePlyResult(final Integer score, final ChessBoard board) {
+		super(score, board);
 	}
 
 	@Override
