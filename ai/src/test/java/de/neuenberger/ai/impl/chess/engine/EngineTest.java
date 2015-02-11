@@ -102,10 +102,10 @@ public class EngineTest {
 		final String fen = "5k2/5p1p/6p1/6B1/8/8/8/4R2K w";
 		final ChessBoard setupByFEN = factory.setupByFEN(fen);
 		Assertions.assertThat(setupByFEN.isCheck()).isFalse();
-		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, 2);
+		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, 3);
 		final PlyResult bestMove = engine.getBestMove();
 		System.out.println(bestMove.getTargetBoard());
-		Assertions.assertThat(bestMove.toString()).isEqualTo("(#) Bh3 Kg8 Rf8");
+		Assertions.assertThat(bestMove.toString()).isEqualTo("(#) Bg5-h6 Kf8-g8 Re1-e8");
 	}
 
 	@Test
@@ -113,10 +113,19 @@ public class EngineTest {
 		final String fen = "5k2/5p1p/6p1/6B1/8/8/8/3R3K w";
 		final ChessBoard setupByFEN = factory.setupByFEN(fen);
 		Assertions.assertThat(setupByFEN.isCheck()).isFalse();
-		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, 2);
+		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, 3);
 		final PlyResult bestMove = engine.getBestMove();
 		System.out.println(bestMove.getTargetBoard());
-		Assertions.assertThat(bestMove.toString()).matches(Pattern.compile("(#) Bg6-f6 .{4,5} Rf1-f8"));
+		Assertions.assertThat(bestMove.toString()).matches(Pattern.compile("^\\(#\\) Bg5-f6 .{4,5} Rd1-d8$"));
+	}
+
+	@Test
+	public void testBestMoveMateIn3CombinationOfBishopAndRook() {
+		final String fen = "5k2/5p2/6p1/6B1/8/8/8/3R3K w";
+		final ChessBoard setupByFEN = factory.setupByFEN(fen);
+		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, 5);
+		final PlyResult bestMove = engine.getBestMove();
+		Assertions.assertThat(bestMove.toString()).isEqualTo("(#) Bg5-f6 Kf8-g8 Rd1-d8 Kg8-h2 Rd8-h8");
 	}
 
 	@Ignore
@@ -133,15 +142,25 @@ public class EngineTest {
 	}
 
 	@Test
+	public void testBestMoveForRookBaselineMate() {
+		final String fen = "7k/8/8/8/8/8/4r1PP/7K b";
+		final ChessBoard setupByFEN = factory.setupByFEN(fen);
+		final ChessEngine engine = new ChessEngine(setupByFEN, Color.BLACK, 1);
+		final PlyResult bestMove = engine.getBestMove();
+
+		Assertions.assertThat(bestMove.toString()).isEqualTo("(#) Re2-e1");
+	}
+
+	@Test
 	public void testBestMoveForMaterialGainTakeQueenNotRook() {
 		final String fen = "1r6/8/1R6/4k1BK/3q4/8/8/7B w";
 
 		final ChessBoard setupByFEN = factory.setupByFEN(fen);
 		Assertions.assertThat(setupByFEN.isCheck()).isFalse();
-		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, 2);
+		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, 3);
 
 		final PlyResult bestMove = engine.getBestMove();
 		System.out.println(bestMove.getTargetBoard());
-		Assertions.assertThat(bestMove.toString()).matches(Pattern.compile("\\(\\d{0,9}\\) Bg5-f6 Ke5-f5 Bf6xd4"));
+		Assertions.assertThat(bestMove.toString()).matches(Pattern.compile("\\(\\d{0,9}\\) Bg5-f6 Ke5-f5 Bf6xd4 .*"));
 	}
 }
