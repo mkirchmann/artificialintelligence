@@ -63,45 +63,6 @@ public abstract class Piece implements Serializable {
 		return color;
 	}
 
-	protected boolean checkPieceAndAddPly(final List<ChessPly> plies, final ChessBoard board, final int sourceX,
-			final int sourceY, final int newX, final int newY, final boolean checkOwnKingsafeness) {
-		final boolean doBreak;
-		if (board.checkCoordinatesValid(newX, newY)) {
-			final Piece pieceAt = board.getPieceAt(newX, newY);
-			if (pieceAt != null) {
-				if (pieceAt.getColor() != getColor()) { // different color, it
-														// is a
-														// capture move.
-					final ChessPly ply = new ChessPly(this, sourceX, sourceY, newX, newY, true, false);
-					checkValidityOfPlyAndAdd(plies, board, checkOwnKingsafeness, ply);
-				}
-				doBreak = true;
-			} else {
-				final ChessPly ply = new ChessPly(this, sourceX, sourceY, newX, newY, false, false);
-				checkValidityOfPlyAndAdd(plies, board, checkOwnKingsafeness, ply);
-				doBreak = false;
-			}
-		} else {
-			doBreak = true;
-		}
-		return doBreak;
-	}
-
-	private void checkValidityOfPlyAndAdd(final List<ChessPly> plies, final ChessBoard board,
-			final boolean checkOwnKingsafeness, final ChessPly ply) {
-		final boolean add;
-		if (checkOwnKingsafeness) {
-			final ChessBoard targetBoard = board.apply(ply);
-			add = !targetBoard.isInCheck(getColor());
-			ply.setCheck(targetBoard.isInCheck(getColor().getOtherColor()));
-		} else {
-			add = true;
-		}
-		if (add) {
-			plies.add(ply);
-		}
-	}
-
 	/**
 	 * @return the simpleScore
 	 */

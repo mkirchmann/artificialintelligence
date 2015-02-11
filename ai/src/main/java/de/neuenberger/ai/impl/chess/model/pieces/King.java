@@ -5,11 +5,15 @@ import java.util.List;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
+import de.neuenberger.ai.impl.chess.model.piece.mover.BasePiecePlyFactory;
 
 public class King extends Piece {
 
+	private final BasePiecePlyFactory factory;
+
 	public King(final Color color) {
 		super('K', color, 100000);
+		factory = new BasePiecePlyFactory(this);
 	}
 
 	@Override
@@ -18,16 +22,16 @@ public class King extends Piece {
 		// TODO castling
 
 		// simple move.
-		checkPieceAndAddPly(plies, board, x, y, x + 1, y + 1, checkSaveness);
-		checkPieceAndAddPly(plies, board, x, y, x + 1, y, checkSaveness);
-		checkPieceAndAddPly(plies, board, x, y, x + 1, y - 1, checkSaveness);
+		factory.checkPieceAndAddPly(plies, board, x, y, x + 1, y + 1, checkSaveness);
+		factory.checkPieceAndAddPly(plies, board, x, y, x + 1, y, checkSaveness);
+		factory.checkPieceAndAddPly(plies, board, x, y, x + 1, y - 1, checkSaveness);
 
-		checkPieceAndAddPly(plies, board, x, y, x, y + 1, checkSaveness);
-		checkPieceAndAddPly(plies, board, x, y, x, y - 1, checkSaveness);
+		factory.checkPieceAndAddPly(plies, board, x, y, x, y + 1, checkSaveness);
+		factory.checkPieceAndAddPly(plies, board, x, y, x, y - 1, checkSaveness);
 
-		checkPieceAndAddPly(plies, board, x, y, x - 1, y + 1, checkSaveness);
-		checkPieceAndAddPly(plies, board, x, y, x - 1, y, checkSaveness);
-		checkPieceAndAddPly(plies, board, x, y, x - 1, y - 1, checkSaveness);
+		factory.checkPieceAndAddPly(plies, board, x, y, x - 1, y + 1, checkSaveness);
+		factory.checkPieceAndAddPly(plies, board, x, y, x - 1, y, checkSaveness);
+		factory.checkPieceAndAddPly(plies, board, x, y, x - 1, y - 1, checkSaveness);
 
 	}
 

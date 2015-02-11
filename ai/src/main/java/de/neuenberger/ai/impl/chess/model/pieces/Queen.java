@@ -5,23 +5,25 @@ import java.util.List;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
+import de.neuenberger.ai.impl.chess.model.piece.mover.DiagonalPlyFactory;
+import de.neuenberger.ai.impl.chess.model.piece.mover.StraightPlyFactory;
 
 public class Queen extends Piece {
 
-	Piece bishop;
-	Piece rook;
+	private final DiagonalPlyFactory diagonalPlyFactory;
+	private final StraightPlyFactory straightPlyFactory;
 
 	public Queen(final Color color) {
 		super('Q', color, 83);
-		bishop = new Bishop(color);
-		rook = new Rook(color);
+		diagonalPlyFactory = new DiagonalPlyFactory(this);
+		straightPlyFactory = new StraightPlyFactory(this);
 	}
 
 	@Override
 	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final int x, final int y,
 			final boolean checkSaveness) {
-		bishop.addPossiblePlies(plies, board, x, y, checkSaveness);
-		rook.addPossiblePlies(plies, board, x, y, checkSaveness);
+		diagonalPlyFactory.addPossiblePlies(plies, board, x, y, checkSaveness);
+		straightPlyFactory.addPossiblePlies(plies, board, x, y, checkSaveness);
 	}
 
 }
