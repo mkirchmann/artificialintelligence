@@ -36,9 +36,9 @@ public class ChessEngine {
 
 		if (plies.isEmpty()) {
 			if (board.isCheck()) {
-				result = new SpecialScorePlyResult(TerminationScore.MATE, board);
+				result = new TerminationScorePlyResult(TerminationScore.MATE, board);
 			} else {
-				result = new SpecialScorePlyResult(TerminationScore.STALEMATE, board);
+				result = new TerminationScorePlyResult(TerminationScore.STALEMATE, board);
 			}
 		} else {
 			for (final ChessPly chessPly : plies) {

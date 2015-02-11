@@ -2,9 +2,9 @@ package de.neuenberger.ai.impl.chess.engine;
 
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 
-public class SpecialScorePlyResult extends PlyResult<TerminationScore> {
+public class TerminationScorePlyResult extends PlyResult<TerminationScore> {
 
-	public SpecialScorePlyResult(final TerminationScore specialScore, final ChessBoard board) {
+	public TerminationScorePlyResult(final TerminationScore specialScore, final ChessBoard board) {
 		super(specialScore, board);
 	}
 
