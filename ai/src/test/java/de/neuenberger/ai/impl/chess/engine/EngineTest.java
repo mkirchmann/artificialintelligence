@@ -54,7 +54,7 @@ public class EngineTest {
 	public void testBestMoveBaselineMateWithQueen() throws Exception {
 		final String fen = "7k/8/8/8/4q3/8/6PP/6K1 b";
 		final ChessBoard setupByFEN = factory.setupByFEN(fen);
-		final ChessEngine engine = new ChessEngine(setupByFEN, Color.BLACK, 2);
+		final ChessEngine engine = new ChessEngine(setupByFEN, Color.BLACK, 1);
 		final PlyResult bestMove = engine.getBestMove();
 		System.out.println(bestMove.getTargetBoard());
 		Assertions.assertThat(bestMove.toString()).isEqualTo("(#) Qe4-e1");

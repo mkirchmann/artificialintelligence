@@ -28,14 +28,14 @@ public class StraightPlyFactory extends BasePiecePlyFactory {
 		}
 
 		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x, y - 1, checkSaveness);
+			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x, y - i, checkSaveness);
 			if (doBreak) {
 				break;
 			}
 		}
 
 		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x, y + 1, checkSaveness);
+			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x, y + i, checkSaveness);
 			if (doBreak) {
 				break;
 			}
