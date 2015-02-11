@@ -178,7 +178,7 @@ public class EngineTest {
 
 		final PlyResult bestMove = engine.getBestMove();
 		System.out.println(bestMove.getTargetBoard());
-		Assertions.assertThat(bestMove.toString()).matches(Pattern.compile("\\(\\d{0,9}\\) Bg5-f6 Ke5-f5 Bf6xd4 .*"));
+		Assertions.assertThat(bestMove.toString()).matches(Pattern.compile("\\(\\d{0,9}\\) Bg5-f6 Ke5-f5 Bf6xd4.*"));
 	}
 
 	@Test
