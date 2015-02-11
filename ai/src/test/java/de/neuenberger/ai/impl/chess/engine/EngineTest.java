@@ -180,4 +180,14 @@ public class EngineTest {
 		System.out.println(bestMove.getTargetBoard());
 		Assertions.assertThat(bestMove.toString()).matches(Pattern.compile("\\(\\d{0,9}\\) Bg5-f6 Ke5-f5 Bf6xd4 .*"));
 	}
+
+	@Test
+	public void testMateWithKnightAndBishop() throws Exception {
+		final String fen = "1k6/8/B7/1K6/3N4/8/8/8 w";
+		final ChessBoard setupByFEN = factory.setupByFEN(fen);
+		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, 5);
+
+		final PlyResult bestMove = engine.getBestMove();
+		Assertions.assertThat(bestMove.toString()).isEqualTo("(#) Kb5-b6 Kb8-a8 Ba6-b7 Ka8-b8 Nd4-c6");
+	}
 }
