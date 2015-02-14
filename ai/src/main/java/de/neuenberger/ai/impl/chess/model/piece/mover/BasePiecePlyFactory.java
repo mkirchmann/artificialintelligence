@@ -39,12 +39,12 @@ public class BasePiecePlyFactory {
 				if (pieceAt.getColor() != getColor()) { // different color, it
 														// is a
 														// capture move.
-					final ChessPly ply = new ChessPly(piece, sourceX, sourceY, newX, newY, true, false);
+					final ChessPly ply = new ChessPly(piece, sourceX, sourceY, newX, newY, pieceAt, false);
 					checkValidityOfPlyAndAdd(plies, board, checkOwnKingsafeness, ply);
 				}
 				doBreak = true;
 			} else {
-				final ChessPly ply = new ChessPly(piece, sourceX, sourceY, newX, newY, false, false);
+				final ChessPly ply = new ChessPly(piece, sourceX, sourceY, newX, newY, null, false);
 				checkValidityOfPlyAndAdd(plies, board, checkOwnKingsafeness, ply);
 				doBreak = false;
 			}

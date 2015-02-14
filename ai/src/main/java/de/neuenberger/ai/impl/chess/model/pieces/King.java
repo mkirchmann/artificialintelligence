@@ -35,4 +35,9 @@ public class King extends Piece {
 
 	}
 
+	@Override
+	public String getUnicode() {
+		return (isWhite()) ? "\u2654" : "\u265A";
+	}
+
 }

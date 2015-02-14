@@ -9,7 +9,7 @@ public class EnPassantPly extends ChessPly {
 	private final int otherPawnY;
 
 	public EnPassantPly(final Piece piece, final int sourceX, final int sourceY, final int targetX, final int targetY,
-			final int otherPawnY, final boolean capture, final boolean check) {
+			final int otherPawnY, final Piece capture, final boolean check) {
 		super(piece, sourceX, sourceY, targetX, targetY, capture, check);
 		this.otherPawnY = otherPawnY;
 	}

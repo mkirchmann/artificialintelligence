@@ -32,4 +32,9 @@ public class Knight extends Piece {
 
 	}
 
+	@Override
+	public String getUnicode() {
+		return (isWhite()) ? "\u2658" : "\u265E";
+	}
+
 }

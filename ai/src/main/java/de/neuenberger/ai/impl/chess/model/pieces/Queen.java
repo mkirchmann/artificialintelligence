@@ -26,4 +26,9 @@ public class Queen extends Piece {
 		straightPlyFactory.addPossiblePlies(plies, board, x, y, checkSaveness);
 	}
 
+	@Override
+	public String getUnicode() {
+		return (isWhite()) ? "\u2655" : "\u265B";
+	}
+
 }

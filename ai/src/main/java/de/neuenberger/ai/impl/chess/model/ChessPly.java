@@ -16,15 +16,18 @@ public class ChessPly implements ChessBoardModifier {
 	private final boolean capture;
 	private boolean check;
 	private final Piece piece;
+	private final Piece capturedPiece;
+	private Integer moveDeltaScore;
 
 	public ChessPly(final Piece piece, final int sourceX, final int sourceY, final int targetX, final int targetY,
-			final boolean capture, final boolean check) {
+			final Piece capturedPiece, final boolean check) {
 		this.piece = piece;
 		this.sourceX = sourceX;
 		this.sourceY = sourceY;
 		this.targetX = targetX;
 		this.targetY = targetY;
-		this.capture = capture;
+		this.capturedPiece = capturedPiece;
+		this.capture = capturedPiece != null;
 		this.check = check;
 	}
 
@@ -110,7 +113,17 @@ public class ChessPly implements ChessBoardModifier {
 		}
 		builder.append((char) ('a' + targetX));
 		builder.append((char) ('1' + targetY));
+		appendPromotionInfo(builder);
+		if (isCheck()) {
+			builder.append("+");
+		}
 		return builder.toString();
+	}
+
+	protected void appendPromotionInfo(final StringBuilder builder) {
+		// do nothing in base implementation. This is only interesting for
+		// promotion.
+
 	}
 
 	/**
@@ -120,4 +133,30 @@ public class ChessPly implements ChessBoardModifier {
 	public void setCheck(final boolean check) {
 		this.check = check;
 	}
+
+	/**
+	 * @return the capturedPiece
+	 */
+	public Piece getCapturedPiece() {
+		return capturedPiece;
+	}
+
+	public Integer getMoveDeltaScore() {
+		if (moveDeltaScore == null) {
+			moveDeltaScore = calculatedMoveDeltaScore();
+		}
+		return moveDeltaScore;
+	}
+
+	protected int calculatedMoveDeltaScore() {
+		int result = 0;
+		if (check) {
+			result += 5;
+		}
+		if (capture) {
+			result += capturedPiece.getSimpleScore() - piece.getSimpleScore();
+		}
+		return result;
+	}
+
 }

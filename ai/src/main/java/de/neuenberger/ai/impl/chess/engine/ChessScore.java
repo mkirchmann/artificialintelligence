@@ -5,7 +5,7 @@ import de.neuenberger.ai.impl.chess.model.Piece;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
 
 public class ChessScore {
-	public int getBoardScore(final ChessBoard board) {
+	public static int getBoardScore(final ChessBoard board) {
 		int ownScore = 0;
 		int opponentScore = 0;
 		for (int x = board.getMinX(); x <= board.getMaxX(); x++) {

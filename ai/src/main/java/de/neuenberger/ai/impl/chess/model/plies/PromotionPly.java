@@ -9,7 +9,7 @@ public class PromotionPly extends ChessPly {
 	private final Piece newPiece;
 
 	public PromotionPly(final Piece piece, final int sourceX, final int sourceY, final int targetX, final int targetY,
-			final Piece newPiece, final boolean capture, final boolean check) {
+			final Piece newPiece, final Piece capture, final boolean check) {
 		super(piece, sourceX, sourceY, targetX, targetY, capture, check);
 		this.newPiece = newPiece;
 	}
@@ -28,8 +28,12 @@ public class PromotionPly extends ChessPly {
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + "" + newPiece.getRepresentation();
+	protected void appendPromotionInfo(final StringBuilder builder) {
+		builder.append(newPiece.getRepresentation());
 	}
 
+	@Override
+	public int calculatedMoveDeltaScore() {
+		return super.calculatedMoveDeltaScore() + newPiece.getSimpleScore();
+	}
 }

@@ -69,4 +69,10 @@ public abstract class Piece implements Serializable {
 	public int getSimpleScore() {
 		return simpleScore;
 	}
+
+	public boolean isWhite() {
+		return getColor() == Color.WHITE;
+	}
+
+	public abstract String getUnicode();
 }

@@ -22,4 +22,9 @@ public class Rook extends Piece {
 		factory.addPossiblePlies(plies, board, x, y, checkSaveness);
 	}
 
+	@Override
+	public String getUnicode() {
+		return (isWhite()) ? "\u2656" : "\u265C";
+	}
+
 }

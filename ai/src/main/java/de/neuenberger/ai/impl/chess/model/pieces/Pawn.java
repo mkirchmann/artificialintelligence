@@ -72,7 +72,7 @@ public class Pawn extends Piece {
 			if (pieceAt == null) { // ok.
 				final boolean capture = false;
 				final boolean check = false;
-				createPlyValidateAndAddToList(board, plies, x, y, promotion, x, newY, capture, check, checkSaveness);
+				createPlyValidateAndAddToList(board, plies, x, y, promotion, x, newY, null, check, checkSaveness);
 			} else {
 				break;
 			}
@@ -86,26 +86,24 @@ public class Pawn extends Piece {
 			final int y, final boolean checkSaveness, final boolean promotion, final int newX, final int newY) {
 		final Piece pieceAt = board.getPieceAt(newX, newY);
 		if (pieceAt != null && pieceAt.getColor() != getColor()) {
-			createPlyValidateAndAddToList(board, plies, x, y, promotion, newX, newY, true, false, checkSaveness);
+			createPlyValidateAndAddToList(board, plies, x, y, promotion, newX, newY, pieceAt, false, checkSaveness);
 		}
 	}
 
 	private void createPlyValidateAndAddToList(final ChessBoard board, final List<ChessPly> plies, final int x,
-			final int y, final boolean promotion, final int newX, final int newY, final boolean capture,
+			final int y, final boolean promotion, final int newX, final int newY, final Piece capture,
 			final boolean check, final boolean checkSaveness) {
 		if (promotion) {
 			final Piece[] promotionPieces = getPromotionPieces();
-			Boolean isCheck = null;
-			if (!checkSaveness) {
-				isCheck = false;
-			}
 			for (final Piece piece : promotionPieces) {
 				final PromotionPly ply = new PromotionPly(this, x, y, newX, newY, piece, capture, check);
-				if (isCheck == null) {
+				final boolean isCheck;
+				if (checkSaveness) {
 					final ChessBoard applied = board.apply(ply);
 					isCheck = applied.isInCheck(getColor());
-					// just check once - all the other moves result in a virtual
-					// similar position.
+					ply.setCheck(applied.isInCheck(getColor().getOtherColor()));
+				} else {
+					isCheck = false;
 				}
 				if (isCheck) { // not a valid move.
 					break;
@@ -134,5 +132,10 @@ public class Pawn extends Piece {
 					new Bishop(getColor()) };
 		}
 		return promotionPieces;
+	}
+
+	@Override
+	public String getUnicode() {
+		return (isWhite()) ? "\u2659" : "\u265F";
 	}
 }
