@@ -184,10 +184,28 @@ public class EngineTest {
 	@Test
 	public void testMateWithKnightAndBishop() throws Exception {
 		final String fen = "1k6/8/B7/1K6/3N4/8/8/8 w";
+		final String toStringMoveSeries = "(#) Kb5-b6 Kb8-a8 Ba6-b7 Ka8-b8 Nd4-c6";
+		final int plies = 5;
+		findBestMoveSeries(fen, toStringMoveSeries, plies);
+	}
+
+	private void findBestMoveSeries(final String fen, final String toStringMoveSeries, final int plies) {
 		final ChessBoard setupByFEN = factory.setupByFEN(fen);
-		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, 5);
+		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, plies);
 
 		final PlyResult bestMove = engine.getBestMove();
-		Assertions.assertThat(bestMove.toString()).isEqualTo("(#) Kb5-b6 Kb8-a8 Ba6-b7 Ka8-b8 Nd4-c6");
+		Assertions.assertThat(bestMove.toString()).isEqualTo(toStringMoveSeries);
+	}
+
+	@Test
+	public void testMateWithPawn() {
+		final String fen = "8/8/6pp/6bk/7n/6PK/8/8 w";
+		findBestMoveSeries(fen, "(#) g3-g4", 1);
+	}
+
+	@Test
+	public void testMateWithBishop() {
+		final String fen = "k7/p7/8/4B3/2B5/4K3/8/8 w";
+		findBestMoveSeries(fen, "(#) Bc4-d5", 1);
 	}
 }
