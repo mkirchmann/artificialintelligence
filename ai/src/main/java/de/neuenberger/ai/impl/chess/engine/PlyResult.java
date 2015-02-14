@@ -10,7 +10,6 @@ public abstract class PlyResult<ScoreType> implements Comparable<PlyResult> {
 	ScoreType score;
 	private final ChessBoard targetBoard;
 
-	// TODO split to two classes for each score.
 	public PlyResult(final ScoreType score, final ChessBoard targetBoard) {
 		this.score = score;
 		this.targetBoard = targetBoard;

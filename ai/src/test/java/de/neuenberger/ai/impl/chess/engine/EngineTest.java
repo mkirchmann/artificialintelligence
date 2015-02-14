@@ -123,7 +123,7 @@ public class EngineTest {
 		final ChessBoard setupByFEN = factory.setupByFEN(fen);
 		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, 5);
 		final PlyResult bestMove = engine.getBestMove();
-		Assertions.assertThat(bestMove.toString()).isEqualTo("(#) Bg5-f6 Kf8-g8 Rd1-d8+ Kg8-h2 Rd8-h8+");
+		Assertions.assertThat(bestMove.toString()).isEqualTo("(#) Bg5-f6 Kf8-g8 Rd1-d8+ Kg8-h7 Rd8-h8+");
 	}
 
 	@Test

@@ -1,7 +1,7 @@
 package de.neuenberger.ai.impl.chess.engine;
 
 public enum TerminationScore {
-	STALEMATE(0, "Stalemate"), MATE(Integer.MAX_VALUE, "#"), MATED(Integer.MIN_VALUE, "-#");
+	STALEMATE(0, "Stalemate"), MATE(2100000000, "#"), MATED(-2100000000, "-#");
 
 	private final Integer internalScore;
 	private final String addition;

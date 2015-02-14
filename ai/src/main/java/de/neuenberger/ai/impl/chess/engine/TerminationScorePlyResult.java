@@ -4,15 +4,21 @@ import de.neuenberger.ai.impl.chess.model.ChessBoard;
 
 public class TerminationScorePlyResult extends PlyResult<TerminationScore> {
 
-	public TerminationScorePlyResult(final TerminationScore specialScore, final ChessBoard board) {
-		super(specialScore, board);
+	public TerminationScorePlyResult(final TerminationScore terminationScore, final ChessBoard board) {
+		super(terminationScore, board);
 	}
 
 	@Override
 	public int compareTo(final PlyResult o) {
 		int result = score.compare(o.getScore());
 		if (result == 0) {
-			result = Integer.valueOf(getPlyCount()).compareTo(o.getPlyCount());
+			if (getScore() == TerminationScore.MATED) {
+				result = Integer.valueOf(getPlyCount()).compareTo(o.getPlyCount());
+			} else if (getScore() == TerminationScore.MATE) {
+				result = Integer.valueOf(o.getPlyCount()).compareTo(getPlyCount());
+			} else {
+				result = 0;
+			}
 		}
 		return result;
 	}
