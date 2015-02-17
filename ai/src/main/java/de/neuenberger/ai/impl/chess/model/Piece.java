@@ -3,6 +3,8 @@ package de.neuenberger.ai.impl.chess.model;
 import java.io.Serializable;
 import java.util.List;
 
+import de.neuenberger.ai.impl.chess.model.BitBoard.Position;
+
 /**
  * A piece is immutable and can generate moves.
  * 
@@ -36,7 +38,8 @@ public abstract class Piece implements Serializable {
 		this.simpleScore = simpleScore;
 	}
 
-	public abstract void addPossiblePlies(List<ChessPly> plies, ChessBoard board, int x, int y, boolean checkSaveness);
+	public abstract void addPossiblePlies(List<ChessPly> plies, ChessBoard board, Position position,
+			boolean checkSaveness);
 
 	@Override
 	public String toString() {
@@ -75,4 +78,5 @@ public abstract class Piece implements Serializable {
 	}
 
 	public abstract String getUnicode();
+
 }

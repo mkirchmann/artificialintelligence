@@ -7,8 +7,6 @@ import de.neuenberger.ai.impl.chess.model.Piece.Color;
 public interface Board<O, C, P extends Ply> {
 	List<P> getPossiblePlies(C c);
 
-	O getPieceAt(int x, int y);
-
 	int getMinX();
 
 	int getMaxX();
@@ -18,8 +16,6 @@ public interface Board<O, C, P extends Ply> {
 	int getMinY();
 
 	// Board<O, C, P> apply(P p);
-
-	boolean isAttackedByOpponent(int x, int y, Color color);
 
 	boolean checkCoordinatesValid(final int newX, final int newY);
 

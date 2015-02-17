@@ -1,5 +1,6 @@
 package de.neuenberger.ai.impl.chess.model.plies;
 
+import de.neuenberger.ai.impl.chess.model.BitBoard;
 import de.neuenberger.ai.impl.chess.model.BoardChanger;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
@@ -8,9 +9,9 @@ public class PromotionPly extends ChessPly {
 
 	private final Piece newPiece;
 
-	public PromotionPly(final Piece piece, final int sourceX, final int sourceY, final int targetX, final int targetY,
+	public PromotionPly(final Piece piece, final BitBoard.Position source, final BitBoard.Position target,
 			final Piece newPiece, final Piece capture, final boolean check) {
-		super(piece, sourceX, sourceY, targetX, targetY, capture, check);
+		super(piece, source, target, capture, check);
 		this.newPiece = newPiece;
 	}
 
@@ -24,7 +25,7 @@ public class PromotionPly extends ChessPly {
 	@Override
 	public void applyTo(final BoardChanger boardChanger) {
 		super.applyTo(boardChanger);
-		boardChanger.setPieceAt(getTargetX(), getTargetY(), newPiece);
+		boardChanger.setPieceAt(getTarget(), newPiece);
 	}
 
 	@Override

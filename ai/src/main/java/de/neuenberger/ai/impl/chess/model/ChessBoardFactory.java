@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.neuenberger.ai.impl.chess.model.BitBoard.Position;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
 import de.neuenberger.ai.impl.chess.model.pieces.Bishop;
 import de.neuenberger.ai.impl.chess.model.pieces.King;
@@ -19,51 +20,6 @@ public class ChessBoardFactory {
 	}
 
 	final ChessBoard chessBoard = new ChessBoard();
-
-	public static class BoardInitialSetup implements ChessBoardModifier {
-
-		@Override
-		public void applyTo(final BoardChanger boardChanger) {
-			final Pawn blackPawn = new Pawn(Color.BLACK);
-			final Pawn whitePawn = new Pawn(Color.WHITE);
-			for (int i = 0; i < 8; i++) {
-				boardChanger.setPieceAt(i, 1, whitePawn);
-				boardChanger.setPieceAt(i, 6, blackPawn);
-			}
-
-			final Rook blackRook = new Rook(Color.BLACK);
-			final Rook whiteRook = new Rook(Color.WHITE);
-			boardChanger.setPieceAt(0, 0, whiteRook);
-			boardChanger.setPieceAt(7, 0, whiteRook);
-			boardChanger.setPieceAt(0, 7, blackRook);
-			boardChanger.setPieceAt(7, 7, blackRook);
-
-			final Piece whiteKnight = new Knight(Color.WHITE);
-			final Piece blackKnight = new Knight(Color.BLACK);
-			boardChanger.setPieceAt(1, 0, whiteKnight);
-			boardChanger.setPieceAt(6, 0, whiteKnight);
-			boardChanger.setPieceAt(1, 7, blackKnight);
-			boardChanger.setPieceAt(6, 7, blackKnight);
-
-			final Piece whiteBishop = new Bishop(Color.WHITE);
-			final Piece blackBishop = new Bishop(Color.BLACK);
-			boardChanger.setPieceAt(2, 0, whiteBishop);
-			boardChanger.setPieceAt(5, 0, whiteBishop);
-			boardChanger.setPieceAt(2, 7, blackBishop);
-			boardChanger.setPieceAt(5, 7, blackBishop);
-
-			boardChanger.setPieceAt(3, 0, new Queen(Color.WHITE));
-			boardChanger.setPieceAt(3, 7, new Queen(Color.BLACK));
-			boardChanger.setPieceAt(4, 0, new King(Color.WHITE));
-			boardChanger.setPieceAt(4, 7, new King(Color.BLACK));
-		}
-
-		@Override
-		public void applyWhosToMove(final BoardChanger boardChanger) {
-			boardChanger.setWhosToMove(Color.WHITE);
-		}
-
-	}
 
 	private static class FENSetup implements ChessBoardModifier {
 
@@ -112,7 +68,8 @@ public class ChessBoardFactory {
 							throw new IllegalArgumentException("Illegal Character: '" + c + "'");
 						}
 
-						boardChanger.setPieceAt(x, y, piece);
+						final Position position = BitBoard.getInstance().fromZeroBasedCoordinates(x, y);
+						boardChanger.setPieceAt(position, piece);
 
 					}
 					x++;
@@ -147,7 +104,6 @@ public class ChessBoardFactory {
 	}
 
 	public ChessBoard createInitalSetup() {
-
-		return chessBoard.apply(new BoardInitialSetup());
+		return setupByFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w");
 	}
 }

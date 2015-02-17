@@ -2,6 +2,8 @@ package de.neuenberger.ai.impl.chess.model.piece.mover;
 
 import java.util.List;
 
+import de.neuenberger.ai.impl.chess.model.BitBoard;
+import de.neuenberger.ai.impl.chess.model.BitBoard.Position;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
@@ -12,35 +14,41 @@ public class DiagonalPlyFactory extends BasePiecePlyFactory {
 		super(piece);
 	}
 
-	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final int x, final int y,
+	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final BitBoard.Position source,
 			final boolean checkSaveness) {
-		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x + i, y + i, checkSaveness);
+
+		List<Position> list = board.getUpperLeftDiagonal(source);
+		for (final Position position : list) {
+			final boolean doBreak = checkPieceAndAddPly(plies, board, source, position, checkSaveness);
 			if (doBreak) {
 				break;
 			}
 		}
 
-		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x - i, y - i, checkSaveness);
+		list = board.getLowerLeftDiagonal(source);
+		for (final Position position : list) {
+			final boolean doBreak = checkPieceAndAddPly(plies, board, source, position, checkSaveness);
 			if (doBreak) {
 				break;
 			}
 		}
 
-		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x + i, y - i, checkSaveness);
+		list = board.getUpperRightDiagonal(source);
+		for (final Position position : list) {
+			final boolean doBreak = checkPieceAndAddPly(plies, board, source, position, checkSaveness);
 			if (doBreak) {
 				break;
 			}
 		}
 
-		for (int i = 1; i < 8; i++) {
-			final boolean doBreak = checkPieceAndAddPly(plies, board, x, y, x - i, y + i, checkSaveness);
+		list = board.getLowerRightDiagonal(source);
+		for (final Position position : list) {
+			final boolean doBreak = checkPieceAndAddPly(plies, board, source, position, checkSaveness);
 			if (doBreak) {
 				break;
 			}
 		}
+
 	}
 
 }

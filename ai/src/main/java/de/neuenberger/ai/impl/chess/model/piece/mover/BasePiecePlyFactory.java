@@ -2,6 +2,7 @@ package de.neuenberger.ai.impl.chess.model.piece.mover;
 
 import java.util.List;
 
+import de.neuenberger.ai.impl.chess.model.BitBoard;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
@@ -30,26 +31,22 @@ public class BasePiecePlyFactory {
 	 * @param checkOwnKingsafeness
 	 * @return Returns true if there was any piece.
 	 */
-	public boolean checkPieceAndAddPly(final List<ChessPly> plies, final ChessBoard board, final int sourceX,
-			final int sourceY, final int newX, final int newY, final boolean checkOwnKingsafeness) {
+	public boolean checkPieceAndAddPly(final List<ChessPly> plies, final ChessBoard board,
+			final BitBoard.Position source, final BitBoard.Position target, final boolean checkOwnKingsafeness) {
 		final boolean doBreak;
-		if (board.checkCoordinatesValid(newX, newY)) {
-			final Piece pieceAt = board.getPieceAt(newX, newY);
-			if (pieceAt != null) {
-				if (pieceAt.getColor() != getColor()) { // different color, it
-														// is a
-														// capture move.
-					final ChessPly ply = new ChessPly(piece, sourceX, sourceY, newX, newY, pieceAt, false);
-					checkValidityOfPlyAndAdd(plies, board, checkOwnKingsafeness, ply);
-				}
-				doBreak = true;
-			} else {
-				final ChessPly ply = new ChessPly(piece, sourceX, sourceY, newX, newY, null, false);
+		final Piece pieceAt = board.getPieceAt(target);
+		if (pieceAt != null) {
+			if (pieceAt.getColor() != getColor()) { // different color, it
+													// is a
+													// capture move.
+				final ChessPly ply = new ChessPly(piece, source, target, pieceAt, false);
 				checkValidityOfPlyAndAdd(plies, board, checkOwnKingsafeness, ply);
-				doBreak = false;
 			}
-		} else {
 			doBreak = true;
+		} else {
+			final ChessPly ply = new ChessPly(piece, source, target, null, false);
+			checkValidityOfPlyAndAdd(plies, board, checkOwnKingsafeness, ply);
+			doBreak = false;
 		}
 		return doBreak;
 	}

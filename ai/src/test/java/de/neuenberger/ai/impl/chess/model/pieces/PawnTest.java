@@ -6,6 +6,7 @@ import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
+import de.neuenberger.ai.impl.chess.model.BitBoard.Position;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessBoardFactory;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
@@ -16,10 +17,11 @@ public class PawnTest {
 
 	@Test
 	public void test() {
-		final Piece pieceAt = chessBoard.getPieceAt(4, 1);
+		final Position position = chessBoard.fromPosition(4, 1);
+		final Piece pieceAt = chessBoard.getPieceAt(position);
 
 		final List<ChessPly> plies = new ArrayList<>();
-		pieceAt.addPossiblePlies(plies, chessBoard, 4, 1, true);
+		pieceAt.addPossiblePlies(plies, chessBoard, position, true);
 
 		Assertions.assertThat(plies).hasSize(2);
 	}

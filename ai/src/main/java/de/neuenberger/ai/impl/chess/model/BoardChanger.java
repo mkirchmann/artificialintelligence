@@ -6,28 +6,22 @@ public interface BoardChanger {
 	/**
 	 * moves a piece from source coordinate to target coordinate
 	 * 
-	 * @param sourceX
-	 *            source x coordinate
-	 * @param sourceY
-	 *            source y coordinate
-	 * @param targetX
-	 *            target x coordinate
-	 * @param targetY
-	 *            target y coordinate
+	 * @param source
+	 *            source coordinate
+	 * @param target
+	 *            target coordinate
 	 */
-	void movePiece(final int sourceX, final int sourceY, final int targetX, final int targetY);
+	void movePiece(final BitBoard.Position source, final BitBoard.Position target);
 
 	/**
 	 * Sets a piece to the coordinates
 	 * 
-	 * @param targetX
-	 *            target x coordinate
-	 * @param targetY
-	 *            target y coordinate
+	 * @param target
+	 *            target coordinate
 	 * @param piece
 	 *            may be null or a piece implementation.
 	 */
-	void setPieceAt(final int targetX, final int targetY, final Piece piece);
+	void setPieceAt(final BitBoard.Position target, final Piece piece);
 
 	/**
 	 * Set who has to move next. This also calculates if the king to be moved is
@@ -36,4 +30,5 @@ public interface BoardChanger {
 	 * @param whosToMove
 	 */
 	void setWhosToMove(final Color whosToMove);
+
 }

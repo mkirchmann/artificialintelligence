@@ -2,6 +2,7 @@ package de.neuenberger.ai.impl.chess.model.pieces;
 
 import java.util.List;
 
+import de.neuenberger.ai.impl.chess.model.BitBoard;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
@@ -17,9 +18,9 @@ public class Rook extends Piece {
 	}
 
 	@Override
-	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final int x, final int y,
+	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final BitBoard.Position source,
 			final boolean checkSaveness) {
-		factory.addPossiblePlies(plies, board, x, y, checkSaveness);
+		factory.addPossiblePlies(plies, board, source, checkSaveness);
 	}
 
 	@Override

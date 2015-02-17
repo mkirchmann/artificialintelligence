@@ -2,6 +2,8 @@ package de.neuenberger.ai.impl.chess.model.pieces;
 
 import java.util.List;
 
+import de.neuenberger.ai.impl.chess.model.BitBoard;
+import de.neuenberger.ai.impl.chess.model.BitBoard.Position;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
@@ -17,21 +19,15 @@ public class King extends Piece {
 	}
 
 	@Override
-	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final int x, final int y,
+	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final BitBoard.Position source,
 			final boolean checkSaveness) {
 		// TODO castling
 
 		// simple move.
-		factory.checkPieceAndAddPly(plies, board, x, y, x + 1, y + 1, checkSaveness);
-		factory.checkPieceAndAddPly(plies, board, x, y, x + 1, y, checkSaveness);
-		factory.checkPieceAndAddPly(plies, board, x, y, x + 1, y - 1, checkSaveness);
-
-		factory.checkPieceAndAddPly(plies, board, x, y, x, y + 1, checkSaveness);
-		factory.checkPieceAndAddPly(plies, board, x, y, x, y - 1, checkSaveness);
-
-		factory.checkPieceAndAddPly(plies, board, x, y, x - 1, y + 1, checkSaveness);
-		factory.checkPieceAndAddPly(plies, board, x, y, x - 1, y, checkSaveness);
-		factory.checkPieceAndAddPly(plies, board, x, y, x - 1, y - 1, checkSaveness);
+		final List<Position> list = board.getKingNormalFields(source);
+		for (final Position position : list) {
+			factory.checkPieceAndAddPly(plies, board, source, position, checkSaveness);
+		}
 
 	}
 

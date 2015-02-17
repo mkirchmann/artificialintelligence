@@ -9,54 +9,36 @@ import de.neuenberger.ai.impl.chess.model.pieces.Pawn;
  * 
  */
 public class ChessPly implements ChessBoardModifier {
-	private final int sourceX;
-	private final int sourceY;
-	private final int targetX;
-	private final int targetY;
+	private final BitBoard.Position source;
+	private final BitBoard.Position target;
 	private final boolean capture;
 	private boolean check;
 	private final Piece piece;
 	private final Piece capturedPiece;
 	private Integer moveDeltaScore;
 
-	public ChessPly(final Piece piece, final int sourceX, final int sourceY, final int targetX, final int targetY,
+	public ChessPly(final Piece piece, final BitBoard.Position source, final BitBoard.Position target,
 			final Piece capturedPiece, final boolean check) {
 		this.piece = piece;
-		this.sourceX = sourceX;
-		this.sourceY = sourceY;
-		this.targetX = targetX;
-		this.targetY = targetY;
+		this.source = source;
+		this.target = target;
 		this.capturedPiece = capturedPiece;
 		this.capture = capturedPiece != null;
 		this.check = check;
 	}
 
 	/**
-	 * @return the sourceX
+	 * @return the source
 	 */
-	public int getSourceX() {
-		return sourceX;
+	public BitBoard.Position getSource() {
+		return source;
 	}
 
 	/**
-	 * @return the sourceY
+	 * @return the target
 	 */
-	public int getSourceY() {
-		return sourceY;
-	}
-
-	/**
-	 * @return the targetX
-	 */
-	public int getTargetX() {
-		return targetX;
-	}
-
-	/**
-	 * @return the targetY
-	 */
-	public int getTargetY() {
-		return targetY;
+	public BitBoard.Position getTarget() {
+		return target;
 	}
 
 	/**
@@ -88,7 +70,7 @@ public class ChessPly implements ChessBoardModifier {
 	 */
 	@Override
 	public void applyTo(final BoardChanger boardChanger) {
-		boardChanger.movePiece(sourceX, sourceY, targetX, targetY);
+		boardChanger.movePiece(source, target);
 	}
 
 	@Override
@@ -104,15 +86,13 @@ public class ChessPly implements ChessBoardModifier {
 		} else {
 			builder.append(piece.getRepresentation());
 		}
-		builder.append((char) ('a' + sourceX));
-		builder.append((char) ('1' + sourceY));
+		builder.append(source);
 		if (isCapture()) {
 			builder.append('x');
 		} else {
 			builder.append('-');
 		}
-		builder.append((char) ('a' + targetX));
-		builder.append((char) ('1' + targetY));
+		builder.append(target);
 		appendPromotionInfo(builder);
 		if (isCheck()) {
 			builder.append("+");
