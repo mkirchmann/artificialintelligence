@@ -2,10 +2,17 @@ package de.neuenberger.ai.impl.chess.model;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.neuenberger.ai.base.model.Board;
-import de.neuenberger.ai.impl.chess.model.BitBoard.Position;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
+import de.neuenberger.ai.impl.chess.model.Piece.PieceType;
+import de.neuenberger.ai.impl.chess.model.bitboard.BitBoardInstance;
+import de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations;
+import de.neuenberger.ai.impl.chess.model.bitboard.Position;
 
 public class ChessBoard implements Board<Piece, Color, ChessPly> {
 
@@ -13,11 +20,19 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	private ChessPly lastPly;
 	private boolean check;
 	private Color whosToMove;
-	private final BitBoard instance;
+	private final BitBoardPreCalculations bitBoard;
+	private final BitBoardInstance bitBoardInstance;
+
+	Logger log = LoggerFactory.getLogger(getClass());
 
 	public ChessBoard() {
+		this(new BitBoardInstance(BitBoardPreCalculations.getInstance()));
+	}
+
+	public ChessBoard(final BitBoardInstance bitBoardInstance) {
+		this.bitBoardInstance = bitBoardInstance;
 		boardContents = new Piece[64];
-		instance = BitBoard.getInstance();
+		bitBoard = BitBoardPreCalculations.getInstance();
 	}
 
 	@Override
@@ -26,7 +41,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 		for (int i = 0; i < 64; i++) {
 			final Piece piece = boardContents[i];
 			if (piece != null && piece.getColor() == color) {
-				piece.addPossiblePlies(result, this, instance.getPosition(i), true);
+				piece.addPossiblePlies(result, this, bitBoard.getPosition(i), true);
 			}
 		}
 		return result;
@@ -34,7 +49,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 
 	@Override
 	public ChessBoard clone() {
-		final ChessBoard result = new ChessBoard();
+		final ChessBoard result = new ChessBoard(bitBoardInstance.clone());
 
 		for (int i = 0; i < 64; i++) {
 			final Piece piece = boardContents[i];
@@ -61,6 +76,9 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 				}
 			}
 			builder.append("\n");
+		}
+		if (lastPly != null) {
+			builder.append(lastPly).append(" ");
 		}
 		builder.append(whosToMove).append(" to move");
 		return builder.toString();
@@ -100,17 +118,18 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	}
 
 	private BoardChangerImpl createBoardChanger() {
-		return new BoardChangerImpl(this);
+		return new BoardChangerImpl(this, bitBoardInstance);
 	}
 
 	public boolean isAttackedByOpponent(final Position target, final Color color) {
 		// TODO improve by checking only rook, bishop , knight and king moves,
 		// i.e. whether these can capture the target coordinates ...
+		final Set<Position> positions = bitBoard.getAttackCheckPositions(target);
 		final List<ChessPly> tempList = new LinkedList<>();
-		for (int i = 0; i < 64; i++) {
-			final Piece piece = boardContents[i];
+		for (final Position position : positions) {
+			final Piece piece = boardContents[position.getIdx()];
 			if (piece != null && piece.getColor() != color) {
-				piece.addPossiblePlies(tempList, this, instance.getPosition(i), false);
+				piece.addPossiblePlies(tempList, this, position, false);
 				for (final ChessPly ply : tempList) {
 					if (ply.getTarget() == target) {
 						return true;
@@ -129,14 +148,12 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 
 	@Override
 	public boolean isInCheck(final Color color) {
-		for (int i = 0; i < 64; i++) {
-			final Piece piece = boardContents[i];
-			if (piece != null && piece.getRepresentation() == 'K' && piece.getColor() == color) {
-				// found king.
-				return isAttackedByOpponent(instance.getPosition(i), color);
-			}
+		final long king = bitBoardInstance.getPieceBitBoard(color, PieceType.KING);
+		final Position position = bitBoard.binarySearch(king);
+		if (position != null) {
+			return isAttackedByOpponent(position, color);
 		}
-		return false;
+		return true;
 	}
 
 	@Override
@@ -144,13 +161,14 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 		return lastPly;
 	}
 
-	private void movePiece(final BitBoard.Position source, final BitBoard.Position target) {
+	private Piece movePiece(final Position source, final Position target) {
 		final Piece piece = boardContents[source.getIdx()];
 		boardContents[source.getIdx()] = null;
 		boardContents[target.getIdx()] = piece;
+		return piece;
 	}
 
-	private void setPieceAt(final BitBoard.Position target, final Piece piece) {
+	private void setPieceAt(final Position target, final Piece piece) {
 		boardContents[target.getIdx()] = piece;
 	}
 
@@ -159,24 +177,30 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 
 		final ChessBoard chessBoard;
 
+		private final BitBoardInstance bitBoardInstance;
+
 		public void invalidate() {
 			valid = false;
 		}
 
-		public BoardChangerImpl(final ChessBoard chessBoard) {
+		public BoardChangerImpl(final ChessBoard chessBoard, final BitBoardInstance bitBoardInstance) {
 			this.chessBoard = chessBoard;
+			this.bitBoardInstance = bitBoardInstance;
 		}
 
 		@Override
-		public void movePiece(final BitBoard.Position source, final BitBoard.Position target) {
+		public void movePiece(final Position source, final Position target, final Piece capturedPiece) {
 			checkValid();
-			chessBoard.movePiece(source, target);
+			final Piece movedPiece = chessBoard.movePiece(source, target);
+			bitBoardInstance.movePiece(movedPiece, capturedPiece, source, target);
 		}
 
 		@Override
-		public void setPieceAt(final BitBoard.Position target, final Piece piece) {
+		public void setPieceAt(final Position target, final Piece piece) {
 			checkValid();
 			chessBoard.setPieceAt(target, piece);
+			bitBoardInstance.setPiece(piece, target);
+
 		}
 
 		private void checkValid() {
@@ -225,95 +249,95 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	/**
 	 * @param position
 	 * @return
-	 * @see de.neuenberger.ai.impl.chess.model.BitBoard#getUpperLeftDiagonal(de.neuenberger.ai.impl.chess.model.BitBoard.Position)
+	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getUpperLeftDiagonal(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getUpperLeftDiagonal(final Position position) {
-		return instance.getUpperLeftDiagonal(position);
+		return bitBoard.getUpperLeftDiagonal(position);
 	}
 
 	/**
 	 * @param position
 	 * @return
-	 * @see de.neuenberger.ai.impl.chess.model.BitBoard#getUpperRightDiagonal(de.neuenberger.ai.impl.chess.model.BitBoard.Position)
+	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getUpperRightDiagonal(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getUpperRightDiagonal(final Position position) {
-		return instance.getUpperRightDiagonal(position);
+		return bitBoard.getUpperRightDiagonal(position);
 	}
 
 	/**
 	 * @param position
 	 * @return
-	 * @see de.neuenberger.ai.impl.chess.model.BitBoard#getLowerLeftDiagonal(de.neuenberger.ai.impl.chess.model.BitBoard.Position)
+	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getLowerLeftDiagonal(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getLowerLeftDiagonal(final Position position) {
-		return instance.getLowerLeftDiagonal(position);
+		return bitBoard.getLowerLeftDiagonal(position);
 	}
 
 	/**
 	 * @param position
 	 * @return
-	 * @see de.neuenberger.ai.impl.chess.model.BitBoard#getLowerRightDiagonal(de.neuenberger.ai.impl.chess.model.BitBoard.Position)
+	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getLowerRightDiagonal(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getLowerRightDiagonal(final Position position) {
-		return instance.getLowerRightDiagonal(position);
+		return bitBoard.getLowerRightDiagonal(position);
 	}
 
 	/**
 	 * @param position
 	 * @return
-	 * @see de.neuenberger.ai.impl.chess.model.BitBoard#getTopVertical(de.neuenberger.ai.impl.chess.model.BitBoard.Position)
+	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getTopVertical(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getTopVertical(final Position position) {
-		return instance.getTopVertical(position);
+		return bitBoard.getTopVertical(position);
 	}
 
 	/**
 	 * @param position
 	 * @return
-	 * @see de.neuenberger.ai.impl.chess.model.BitBoard#getBottomVertical(de.neuenberger.ai.impl.chess.model.BitBoard.Position)
+	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getBottomVertical(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getBottomVertical(final Position position) {
-		return instance.getBottomVertical(position);
+		return bitBoard.getBottomVertical(position);
 	}
 
 	/**
 	 * @param position
 	 * @return
-	 * @see de.neuenberger.ai.impl.chess.model.BitBoard#getLeftHorizontal(de.neuenberger.ai.impl.chess.model.BitBoard.Position)
+	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getLeftHorizontal(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getLeftHorizontal(final Position position) {
-		return instance.getLeftHorizontal(position);
+		return bitBoard.getLeftHorizontal(position);
 	}
 
 	/**
 	 * @param position
 	 * @return
-	 * @see de.neuenberger.ai.impl.chess.model.BitBoard#getRightHorizontal(de.neuenberger.ai.impl.chess.model.BitBoard.Position)
+	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getRightHorizontal(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getRightHorizontal(final Position position) {
-		return instance.getRightHorizontal(position);
+		return bitBoard.getRightHorizontal(position);
 	}
 
 	/**
 	 * @param position
 	 * @return
-	 * @see de.neuenberger.ai.impl.chess.model.BitBoard#getKingNormalFields(de.neuenberger.ai.impl.chess.model.BitBoard.Position)
+	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getKingNormalFields(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getKingNormalFields(final Position position) {
-		return instance.getKingNormalFields(position);
+		return bitBoard.getKingNormalFields(position);
 	}
 
 	/**
 	 * @param position
 	 * @return
-	 * @see de.neuenberger.ai.impl.chess.model.BitBoard#getKnightMoves(de.neuenberger.ai.impl.chess.model.BitBoard.Position)
+	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getKnightMoves(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getKnightMoves(final Position position) {
-		return instance.getKnightMoves(position);
+		return bitBoard.getKnightMoves(position);
 	}
 
 	public Position fromPosition(final int x, final int y) {
-		return instance.fromZeroBasedCoordinates(x, y);
+		return bitBoard.fromZeroBasedCoordinates(x, y);
 	}
 
 	public Piece getPieceAt(final int i) {
@@ -323,37 +347,48 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	/**
 	 * @param position
 	 * @return
-	 * @see de.neuenberger.ai.impl.chess.model.BitBoard#getBlackPawnNormalMoves(de.neuenberger.ai.impl.chess.model.BitBoard.Position)
+	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getBlackPawnNormalMoves(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getBlackPawnNormalMoves(final Position position) {
-		return instance.getBlackPawnNormalMoves(position);
+		return bitBoard.getBlackPawnNormalMoves(position);
 	}
 
 	/**
 	 * @param position
 	 * @return
-	 * @see de.neuenberger.ai.impl.chess.model.BitBoard#getWhitePawnNormalMoves(de.neuenberger.ai.impl.chess.model.BitBoard.Position)
+	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getWhitePawnNormalMoves(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getWhitePawnNormalMoves(final Position position) {
-		return instance.getWhitePawnNormalMoves(position);
+		return bitBoard.getWhitePawnNormalMoves(position);
 	}
 
 	/**
 	 * @param position
 	 * @return
-	 * @see de.neuenberger.ai.impl.chess.model.BitBoard#getBlackPawnCaptureMoves(de.neuenberger.ai.impl.chess.model.BitBoard.Position)
+	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getBlackPawnCaptureMoves(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getBlackPawnCaptureMoves(final Position position) {
-		return instance.getBlackPawnCaptureMoves(position);
+		return bitBoard.getBlackPawnCaptureMoves(position);
 	}
 
 	/**
 	 * @param position
 	 * @return
-	 * @see de.neuenberger.ai.impl.chess.model.BitBoard#getWhitePawnCaptureMoves(de.neuenberger.ai.impl.chess.model.BitBoard.Position)
+	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getWhitePawnCaptureMoves(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getWhitePawnCaptureMoves(final Position position) {
-		return instance.getWhitePawnCaptureMoves(position);
+		return bitBoard.getWhitePawnCaptureMoves(position);
+	}
+
+	public int getScore() {
+		return bitBoardInstance.getPieceScore();
+	}
+
+	/**
+	 * @return the bitBoardInstance
+	 */
+	public BitBoardInstance getBitBoardInstance() {
+		return bitBoardInstance;
 	}
 
 }

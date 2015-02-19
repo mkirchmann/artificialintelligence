@@ -1,5 +1,6 @@
 package de.neuenberger.ai.impl.chess.model;
 
+import de.neuenberger.ai.impl.chess.model.bitboard.Position;
 import de.neuenberger.ai.impl.chess.model.pieces.Pawn;
 
 /**
@@ -9,16 +10,16 @@ import de.neuenberger.ai.impl.chess.model.pieces.Pawn;
  * 
  */
 public class ChessPly implements ChessBoardModifier {
-	private final BitBoard.Position source;
-	private final BitBoard.Position target;
+	private final Position source;
+	private final Position target;
 	private final boolean capture;
 	private boolean check;
 	private final Piece piece;
 	private final Piece capturedPiece;
 	private Integer moveDeltaScore;
 
-	public ChessPly(final Piece piece, final BitBoard.Position source, final BitBoard.Position target,
-			final Piece capturedPiece, final boolean check) {
+	public ChessPly(final Piece piece, final Position source, final Position target, final Piece capturedPiece,
+			final boolean check) {
 		this.piece = piece;
 		this.source = source;
 		this.target = target;
@@ -30,14 +31,14 @@ public class ChessPly implements ChessBoardModifier {
 	/**
 	 * @return the source
 	 */
-	public BitBoard.Position getSource() {
+	public Position getSource() {
 		return source;
 	}
 
 	/**
 	 * @return the target
 	 */
-	public BitBoard.Position getTarget() {
+	public Position getTarget() {
 		return target;
 	}
 
@@ -70,7 +71,7 @@ public class ChessPly implements ChessBoardModifier {
 	 */
 	@Override
 	public void applyTo(final BoardChanger boardChanger) {
-		boardChanger.movePiece(source, target);
+		boardChanger.movePiece(source, target, capturedPiece);
 	}
 
 	@Override

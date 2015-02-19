@@ -3,7 +3,7 @@ package de.neuenberger.ai.impl.chess.model;
 import java.io.Serializable;
 import java.util.List;
 
-import de.neuenberger.ai.impl.chess.model.BitBoard.Position;
+import de.neuenberger.ai.impl.chess.model.bitboard.Position;
 
 /**
  * A piece is immutable and can generate moves.
@@ -13,12 +13,10 @@ import de.neuenberger.ai.impl.chess.model.BitBoard.Position;
  */
 public abstract class Piece implements Serializable {
 
-	private final char representation;
 	private final Color color;
-	private final int simpleScore;
 
 	public enum Color {
-		BLACK, WHITE;
+		WHITE, BLACK;
 
 		/**
 		 * @return the nextColor
@@ -32,10 +30,36 @@ public abstract class Piece implements Serializable {
 		}
 	}
 
-	public Piece(final char representation, final Color color, final int simpleScore) {
-		this.representation = representation;
+	public enum PieceType {
+		KING('K', 100000), QUEEN('Q', 83), ROOK('R', 50), BISHOP('B', 30), KNIGHT('N', 30), PAWN('P', 10);
+		private final char representation;
+		private final int simpleScore;
+
+		PieceType(final char representation, final int simpleScore) {
+			this.representation = representation;
+			this.simpleScore = simpleScore;
+		}
+
+		/**
+		 * @return the representation
+		 */
+		public char getRepresentation() {
+			return representation;
+		}
+
+		/**
+		 * @return the simpleScore
+		 */
+		public int getSimpleScore() {
+			return simpleScore;
+		}
+	}
+
+	private final PieceType pieceType;
+
+	public Piece(final PieceType pieceType, final Color color) {
+		this.pieceType = pieceType;
 		this.color = color;
-		this.simpleScore = simpleScore;
 	}
 
 	public abstract void addPossiblePlies(List<ChessPly> plies, ChessBoard board, Position position,
@@ -45,9 +69,9 @@ public abstract class Piece implements Serializable {
 	public String toString() {
 		String result;
 		if (color == Color.BLACK) {
-			result = ("" + representation).toLowerCase();
+			result = ("" + getRepresentation()).toLowerCase();
 		} else {
-			result = "" + representation;
+			result = "" + getRepresentation();
 		}
 		return result;
 	}
@@ -56,7 +80,7 @@ public abstract class Piece implements Serializable {
 	 * @return the representation
 	 */
 	public char getRepresentation() {
-		return representation;
+		return pieceType.getRepresentation();
 	}
 
 	/**
@@ -70,7 +94,7 @@ public abstract class Piece implements Serializable {
 	 * @return the simpleScore
 	 */
 	public int getSimpleScore() {
-		return simpleScore;
+		return pieceType.getSimpleScore();
 	}
 
 	public boolean isWhite() {
@@ -78,5 +102,9 @@ public abstract class Piece implements Serializable {
 	}
 
 	public abstract String getUnicode();
+
+	public PieceType getPieceType() {
+		return pieceType;
+	}
 
 }

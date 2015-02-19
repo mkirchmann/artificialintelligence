@@ -4,8 +4,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.neuenberger.ai.impl.chess.model.BitBoard.Position;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
+import de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations;
+import de.neuenberger.ai.impl.chess.model.bitboard.Position;
 import de.neuenberger.ai.impl.chess.model.pieces.Bishop;
 import de.neuenberger.ai.impl.chess.model.pieces.King;
 import de.neuenberger.ai.impl.chess.model.pieces.Knight;
@@ -68,7 +69,7 @@ public class ChessBoardFactory {
 							throw new IllegalArgumentException("Illegal Character: '" + c + "'");
 						}
 
-						final Position position = BitBoard.getInstance().fromZeroBasedCoordinates(x, y);
+						final Position position = BitBoardPreCalculations.getInstance().fromZeroBasedCoordinates(x, y);
 						boardChanger.setPieceAt(position, piece);
 
 					}

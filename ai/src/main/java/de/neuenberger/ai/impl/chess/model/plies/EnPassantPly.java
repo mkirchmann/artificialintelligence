@@ -1,16 +1,16 @@
 package de.neuenberger.ai.impl.chess.model.plies;
 
-import de.neuenberger.ai.impl.chess.model.BitBoard;
 import de.neuenberger.ai.impl.chess.model.BoardChanger;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
+import de.neuenberger.ai.impl.chess.model.bitboard.Position;
 
 public class EnPassantPly extends ChessPly {
 
-	private final BitBoard.Position otherPawn;
+	private final Position otherPawn;
 
-	public EnPassantPly(final Piece piece, final BitBoard.Position source, final BitBoard.Position target,
-			final BitBoard.Position otherPawn, final Piece capture, final boolean check) {
+	public EnPassantPly(final Piece piece, final Position source, final Position target,
+			final Position otherPawn, final Piece capture, final boolean check) {
 		super(piece, source, target, capture, check);
 		this.otherPawn = otherPawn;
 	}

@@ -1,6 +1,7 @@
 package de.neuenberger.ai.impl.chess.model;
 
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
+import de.neuenberger.ai.impl.chess.model.bitboard.Position;
 
 public interface BoardChanger {
 	/**
@@ -10,8 +11,9 @@ public interface BoardChanger {
 	 *            source coordinate
 	 * @param target
 	 *            target coordinate
+	 * @param capturedPiece
 	 */
-	void movePiece(final BitBoard.Position source, final BitBoard.Position target);
+	void movePiece(final Position source, final Position target, Piece capturedPiece);
 
 	/**
 	 * Sets a piece to the coordinates
@@ -21,7 +23,7 @@ public interface BoardChanger {
 	 * @param piece
 	 *            may be null or a piece implementation.
 	 */
-	void setPieceAt(final BitBoard.Position target, final Piece piece);
+	void setPieceAt(final Position target, final Piece piece);
 
 	/**
 	 * Set who has to move next. This also calculates if the king to be moved is

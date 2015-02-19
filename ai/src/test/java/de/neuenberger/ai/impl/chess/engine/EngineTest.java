@@ -189,22 +189,44 @@ public class EngineTest {
 	}
 
 	private void findBestMoveSeries(final String fen, final String toStringMoveSeries, final int plies) {
+		final PlyResult bestMove = findBestMove(fen, plies);
+		Assertions.assertThat(bestMove.toString()).isEqualTo(toStringMoveSeries);
+	}
+
+	private PlyResult findBestMove(final String fen, final int plies) {
 		final ChessBoard setupByFEN = factory.setupByFEN(fen);
 		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, plies);
 
 		final PlyResult bestMove = engine.getBestMove();
-		Assertions.assertThat(bestMove.toString()).isEqualTo(toStringMoveSeries);
+		return bestMove;
 	}
 
 	@Test
 	public void testMateWithPawn() {
 		final String fen = "8/8/6pp/6bk/7n/6PK/8/8 w";
-		findBestMoveSeries(fen, "(#) g3-g4", 1);
+		findBestMoveSeries(fen, "(#) g3-g4+", 1);
 	}
 
 	@Test
 	public void testMateWithBishop() {
 		final String fen = "k7/p7/8/4B3/2B5/4K3/8/8 w";
 		findBestMoveSeries(fen, "(#) Bc4-d5+", 1);
+	}
+
+	@Test
+	public void testNearlyMate() {
+		final PlyResult findBestMove = findBestMove("7R/2pr4/2n3B1/8/1kP5/1P6/PK6/1N3r2 w", 5);
+
+	}
+
+	@Test
+	public void testWinQueenWithPawnFork() {
+		final PlyResult findBestMove = findBestMove("k1q5/7P/1P6/2N5/8/8/8/1K6 w", 4);
+		final String regex = "\\(\\d\\) b6-b7+ Qc8xb7 Nc5xb7 Ka8xb7";
+		patternMatchMove(findBestMove, regex);
+	}
+
+	private void patternMatchMove(final PlyResult findBestMove, final String regex) {
+		Assertions.assertThat(findBestMove.toString()).matches(Pattern.compile(regex));
 	}
 }

@@ -3,11 +3,10 @@ package de.neuenberger.ai.impl.chess.model.pieces;
 import java.util.List;
 
 import de.neuenberger.ai.base.model.Board;
-import de.neuenberger.ai.impl.chess.model.BitBoard;
-import de.neuenberger.ai.impl.chess.model.BitBoard.Position;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
+import de.neuenberger.ai.impl.chess.model.bitboard.Position;
 import de.neuenberger.ai.impl.chess.model.plies.PromotionPly;
 
 public class Pawn extends Piece {
@@ -15,13 +14,12 @@ public class Pawn extends Piece {
 	private transient Piece[] promotionPieces;
 
 	public Pawn(final Color color) {
-		super('P', color, 10);
+		super(PieceType.PAWN, color);
 	}
 
 	@Override
-	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final BitBoard.Position source,
+	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final Position source,
 			final boolean checkSaveness) {
-		int direction;
 		int enPassantLine;
 		boolean promotion;
 		final int x = source.getX().ordinal();
@@ -31,13 +29,11 @@ public class Pawn extends Piece {
 		List<Position> pawnNormalMoves;
 
 		if (getColor() == Color.WHITE) {
-			direction = 1;
 			promotion = source.getY() == 7;
 			enPassantLine = 5;
 			pawnCaptures = board.getWhitePawnCaptureMoves(source);
 			pawnNormalMoves = board.getWhitePawnNormalMoves(source);
 		} else if (getColor() == Color.BLACK) {
-			direction = -1;
 			promotion = source.getY() == 2;
 			enPassantLine = 4;
 			pawnCaptures = board.getBlackPawnCaptureMoves(source);
@@ -76,9 +72,8 @@ public class Pawn extends Piece {
 		}
 	}
 
-	private void checkIfIsCaptureAndIfSoAdd(final List<ChessPly> plies, final ChessBoard board,
-			final BitBoard.Position source, final boolean checkSaveness, final boolean promotion,
-			final BitBoard.Position target) {
+	private void checkIfIsCaptureAndIfSoAdd(final List<ChessPly> plies, final ChessBoard board, final Position source,
+			final boolean checkSaveness, final boolean promotion, final Position target) {
 		final Piece pieceAt = board.getPieceAt(target);
 		if (pieceAt != null && pieceAt.getColor() != getColor()) {
 			createPlyValidateAndAddToList(board, plies, source, promotion, target, pieceAt, false, checkSaveness);
@@ -86,24 +81,14 @@ public class Pawn extends Piece {
 	}
 
 	private void createPlyValidateAndAddToList(final ChessBoard board, final List<ChessPly> plies,
-			final BitBoard.Position source, final boolean promotion, final BitBoard.Position target,
-			final Piece capture, final boolean check, final boolean checkSaveness) {
+			final Position source, final boolean promotion, final Position target, final Piece capture,
+			final boolean check, final boolean checkSaveness) {
 		if (promotion) {
 			final Piece[] promotionPieces = getPromotionPieces();
 			for (final Piece piece : promotionPieces) {
 				final PromotionPly ply = new PromotionPly(this, source, target, piece, capture, check);
-				final boolean isCheck;
-				if (checkSaveness) {
-					final ChessBoard applied = board.apply(ply);
-					isCheck = applied.isInCheck(getColor());
-					ply.setCheck(applied.isInCheck(getColor().getOtherColor()));
-				} else {
-					isCheck = false;
-				}
-				if (isCheck) { // not a valid move.
+				if (checkForCheckAndAdd(board, plies, checkSaveness, ply)) {
 					break;
-				} else {
-					plies.add(ply);
 				}
 			}
 		} else {
@@ -112,6 +97,7 @@ public class Pawn extends Piece {
 			if (checkSaveness) {
 				final Board<Piece, Color, ChessPly> applied = board.apply(ply);
 				valid = !applied.isInCheck(getColor());
+				ply.setCheck(applied.isInCheck(getColor().getOtherColor()));
 			} else {
 				valid = true;
 			}
@@ -119,6 +105,30 @@ public class Pawn extends Piece {
 				plies.add(ply);
 			}
 		}
+	}
+
+	/**
+	 * Returns if the move is invalid.
+	 * 
+	 * @param board
+	 * @param plies
+	 * @param checkSaveness
+	 * @param ply
+	 */
+	private boolean checkForCheckAndAdd(final ChessBoard board, final List<ChessPly> plies,
+			final boolean checkSaveness, final PromotionPly ply) {
+		final boolean invalid;
+		if (checkSaveness) {
+			final ChessBoard applied = board.apply(ply);
+			invalid = applied.isInCheck(getColor());
+			ply.setCheck(applied.isInCheck(getColor().getOtherColor()));
+		} else {
+			invalid = false;
+		}
+		if (!invalid) { // not a valid move.
+			plies.add(ply);
+		}
+		return invalid;
 	}
 
 	private Piece[] getPromotionPieces() {

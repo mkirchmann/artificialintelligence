@@ -2,11 +2,11 @@ package de.neuenberger.ai.impl.chess.model.piece.mover;
 
 import java.util.List;
 
-import de.neuenberger.ai.impl.chess.model.BitBoard;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
+import de.neuenberger.ai.impl.chess.model.bitboard.Position;
 
 public class BasePiecePlyFactory {
 	private final Piece piece;
@@ -32,7 +32,7 @@ public class BasePiecePlyFactory {
 	 * @return Returns true if there was any piece.
 	 */
 	public boolean checkPieceAndAddPly(final List<ChessPly> plies, final ChessBoard board,
-			final BitBoard.Position source, final BitBoard.Position target, final boolean checkOwnKingsafeness) {
+			final Position source, final Position target, final boolean checkOwnKingsafeness) {
 		final boolean doBreak;
 		final Piece pieceAt = board.getPieceAt(target);
 		if (pieceAt != null) {
