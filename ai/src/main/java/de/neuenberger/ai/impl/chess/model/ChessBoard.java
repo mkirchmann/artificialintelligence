@@ -10,8 +10,8 @@ import de.neuenberger.ai.impl.chess.model.Piece.Color;
 import de.neuenberger.ai.impl.chess.model.bitboard.BitBoardInstance;
 import de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations;
 import de.neuenberger.ai.impl.chess.model.bitboard.Position;
-import de.neuenberger.ai.impl.chess.model.delegate.IsInCheckBruteForceAllFieldsStrategy;
 import de.neuenberger.ai.impl.chess.model.delegate.IsInCheckCalculationStrategy;
+import de.neuenberger.ai.impl.chess.model.delegate.IsInCheckUseBitBoard;
 
 public class ChessBoard implements Board<Piece, Color, ChessPly> {
 
@@ -21,9 +21,9 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	private Color whosToMove = Color.WHITE;
 	private final BitBoardPreCalculations bitBoard;
 	private final BitBoardInstance bitBoardInstance;
+	static IsInCheckCalculationStrategy isInCheckUseBitBoardStrategy = new IsInCheckUseBitBoard();
 	// static IsInCheckCalculationStrategy isInCheckUseBitBoardStrategy = new
-	// IsInCheckUseBitBoard();
-	static IsInCheckCalculationStrategy isInCheckUseBitBoardStrategy = new IsInCheckBruteForceAllFieldsStrategy();
+	// IsInCheckBruteForceAllFieldsStrategy();
 
 	Logger log = LoggerFactory.getLogger(getClass());
 
