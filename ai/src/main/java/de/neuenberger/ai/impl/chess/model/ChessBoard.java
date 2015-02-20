@@ -1,27 +1,29 @@
 package de.neuenberger.ai.impl.chess.model;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.neuenberger.ai.base.model.Board;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
-import de.neuenberger.ai.impl.chess.model.Piece.PieceType;
 import de.neuenberger.ai.impl.chess.model.bitboard.BitBoardInstance;
 import de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations;
 import de.neuenberger.ai.impl.chess.model.bitboard.Position;
+import de.neuenberger.ai.impl.chess.model.delegate.IsInCheckBruteForceAllFieldsStrategy;
+import de.neuenberger.ai.impl.chess.model.delegate.IsInCheckCalculationStrategy;
 
 public class ChessBoard implements Board<Piece, Color, ChessPly> {
 
 	private final Piece[] boardContents;
 	private ChessPly lastPly;
 	private boolean check;
-	private Color whosToMove;
+	private Color whosToMove = Color.WHITE;
 	private final BitBoardPreCalculations bitBoard;
 	private final BitBoardInstance bitBoardInstance;
+	// static IsInCheckCalculationStrategy isInCheckUseBitBoardStrategy = new
+	// IsInCheckUseBitBoard();
+	static IsInCheckCalculationStrategy isInCheckUseBitBoardStrategy = new IsInCheckBruteForceAllFieldsStrategy();
 
 	Logger log = LoggerFactory.getLogger(getClass());
 
@@ -37,14 +39,14 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 
 	@Override
 	public List<ChessPly> getPossiblePlies(final Color color) {
-		final List<ChessPly> result = new LinkedList<>();
+		final PlyList plyList = new BasePlyList();
 		for (int i = 0; i < 64; i++) {
 			final Piece piece = boardContents[i];
 			if (piece != null && piece.getColor() == color) {
-				piece.addPossiblePlies(result, this, bitBoard.getPosition(i), true);
+				piece.addPossiblePlies(plyList, this, bitBoard.getPosition(i), true);
 			}
 		}
-		return result;
+		return plyList.getCollection();
 	}
 
 	@Override
@@ -121,39 +123,14 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 		return new BoardChangerImpl(this, bitBoardInstance);
 	}
 
-	public boolean isAttackedByOpponent(final Position target, final Color color) {
-		// TODO improve by checking only rook, bishop , knight and king moves,
-		// i.e. whether these can capture the target coordinates ...
-		final Set<Position> positions = bitBoard.getAttackCheckPositions(target);
-		final List<ChessPly> tempList = new LinkedList<>();
-		for (final Position position : positions) {
-			final Piece piece = boardContents[position.getIdx()];
-			if (piece != null && piece.getColor() != color) {
-				piece.addPossiblePlies(tempList, this, position, false);
-				for (final ChessPly ply : tempList) {
-					if (ply.getTarget() == target) {
-						return true;
-					}
-				}
-				tempList.clear();
-			}
-		}
-		return false;
+	@Override
+	public boolean isInCheck(final Color color) {
+		return isInCheckUseBitBoardStrategy.isInCheck(color, this, bitBoardInstance);
 	}
 
 	@Override
 	public boolean checkCoordinatesValid(final int newX, final int newY) {
 		return getMinX() <= newX && newX <= getMaxX() && getMinY() <= newY && newY <= getMaxY();
-	}
-
-	@Override
-	public boolean isInCheck(final Color color) {
-		final long king = bitBoardInstance.getPieceBitBoard(color, PieceType.KING);
-		final Position position = bitBoard.binarySearch(king);
-		if (position != null) {
-			return isAttackedByOpponent(position, color);
-		}
-		return true;
 	}
 
 	@Override

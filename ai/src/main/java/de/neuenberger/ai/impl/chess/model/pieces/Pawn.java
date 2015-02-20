@@ -6,6 +6,7 @@ import de.neuenberger.ai.base.model.Board;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
+import de.neuenberger.ai.impl.chess.model.PlyList;
 import de.neuenberger.ai.impl.chess.model.bitboard.Position;
 import de.neuenberger.ai.impl.chess.model.plies.PromotionPly;
 
@@ -18,7 +19,7 @@ public class Pawn extends Piece {
 	}
 
 	@Override
-	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final Position source,
+	public void addPossiblePlies(final PlyList plies, final ChessBoard board, final Position source,
 			final boolean checkSaveness) {
 		int enPassantLine;
 		boolean promotion;
@@ -72,7 +73,7 @@ public class Pawn extends Piece {
 		}
 	}
 
-	private void checkIfIsCaptureAndIfSoAdd(final List<ChessPly> plies, final ChessBoard board, final Position source,
+	private void checkIfIsCaptureAndIfSoAdd(final PlyList plies, final ChessBoard board, final Position source,
 			final boolean checkSaveness, final boolean promotion, final Position target) {
 		final Piece pieceAt = board.getPieceAt(target);
 		if (pieceAt != null && pieceAt.getColor() != getColor()) {
@@ -80,9 +81,9 @@ public class Pawn extends Piece {
 		}
 	}
 
-	private void createPlyValidateAndAddToList(final ChessBoard board, final List<ChessPly> plies,
-			final Position source, final boolean promotion, final Position target, final Piece capture,
-			final boolean check, final boolean checkSaveness) {
+	private void createPlyValidateAndAddToList(final ChessBoard board, final PlyList plies, final Position source,
+			final boolean promotion, final Position target, final Piece capture, final boolean check,
+			final boolean checkSaveness) {
 		if (promotion) {
 			final Piece[] promotionPieces = getPromotionPieces();
 			for (final Piece piece : promotionPieces) {
@@ -115,8 +116,8 @@ public class Pawn extends Piece {
 	 * @param checkSaveness
 	 * @param ply
 	 */
-	private boolean checkForCheckAndAdd(final ChessBoard board, final List<ChessPly> plies,
-			final boolean checkSaveness, final PromotionPly ply) {
+	private boolean checkForCheckAndAdd(final ChessBoard board, final PlyList plies, final boolean checkSaveness,
+			final PromotionPly ply) {
 		final boolean invalid;
 		if (checkSaveness) {
 			final ChessBoard applied = board.apply(ply);

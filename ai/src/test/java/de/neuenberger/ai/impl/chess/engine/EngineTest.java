@@ -14,6 +14,8 @@ import de.neuenberger.ai.impl.chess.model.Piece.Color;
 public class EngineTest {
 	ChessBoardFactory factory = new ChessBoardFactory();
 
+	private static final String ANY_NUMERIC_RATING = "^\\(\\-{0,1}\\d{0,9}\\) ";
+
 	@Test
 	public void testBestMoveForUnderPromotionWithMate() {
 		final String fen = "6nn/5Prk/6pp/8/8/8/8/7K";
@@ -65,7 +67,7 @@ public class EngineTest {
 		final ChessEngine engine = new ChessEngine(setupByFEN, Color.WHITE, 2);
 		final PlyResult bestMove = engine.getBestMove();
 		System.out.println(bestMove.getTargetBoard());
-		Assertions.assertThat(bestMove.toString()).matches(Pattern.compile("^\\(-\\d{0,9}\\) h2-h[34] .*$"));
+		Assertions.assertThat(bestMove.toMovesString()).matches(Pattern.compile("h2-h[34] .*$"));
 	}
 
 	private void noMoveWhenMated(final String fen, final Color color) {
@@ -216,14 +218,32 @@ public class EngineTest {
 	@Test
 	public void testNearlyMate() {
 		final PlyResult findBestMove = findBestMove("7R/2pr4/2n3B1/8/1kP5/1P6/PK6/1N3r2 w", 5);
-
+		patternMatchMove(findBestMove, ANY_NUMERIC_RATING + "Rh8-h5");
 	}
 
 	@Test
 	public void testWinQueenWithPawnFork() {
 		final PlyResult findBestMove = findBestMove("k1q5/7P/1P6/2N5/8/8/8/1K6 w", 4);
-		final String regex = "\\(\\d\\) b6-b7+ Qc8xb7 Nc5xb7 Ka8xb7";
-		patternMatchMove(findBestMove, regex);
+		Assertions.assertThat(findBestMove.toMovesString()).isEqualTo("b6-b7+ Qc8xb7+ Nc5xb7 Ka8xb7");
+	}
+
+	@Test
+	public void testMateInTwoWithSilentMove() {
+		final PlyResult plyResult = findBestMove("8/8/4R1p1/2kPp3/2P2pr1/5p2/3K1p2/3Q4 w", 5);
+		Assertions.assertThat(plyResult.toString()).startsWith("(#) Kd2-c3 ").endsWith("Re6-c6+");
+	}
+
+	@Test
+	public void testRookStrategy() {
+		final PlyResult plyResult = findBestMove("r6k/ppp1pp1p/6p1/8/8/6P1/PPP1PP1P/R6K w", 5);
+		Assertions.assertThat(plyResult.toMovesString()).startsWith("Ra1-d1 ");
+	}
+
+	@Test
+	public void testMateInTwoStartsWithSilentknightMove() {
+		final PlyResult plyResult = findBestMove("7k/2nN4/8/8/8/8/8/1K4R1 w", 5);
+		Assertions.assertThat(plyResult.getScore().toString()).isEqualTo("#");
+		Assertions.assertThat(plyResult.toMovesString()).startsWith("Nd7-f6 ").endsWith(" Rg1-g8+");
 	}
 
 	private void patternMatchMove(final PlyResult findBestMove, final String regex) {

@@ -1,7 +1,6 @@
 package de.neuenberger.ai.impl.chess.model;
 
 import java.io.Serializable;
-import java.util.List;
 
 import de.neuenberger.ai.impl.chess.model.bitboard.Position;
 
@@ -62,8 +61,7 @@ public abstract class Piece implements Serializable {
 		this.color = color;
 	}
 
-	public abstract void addPossiblePlies(List<ChessPly> plies, ChessBoard board, Position position,
-			boolean checkSaveness);
+	public abstract void addPossiblePlies(PlyList list, ChessBoard board, Position position, boolean checkSaveness);
 
 	@Override
 	public String toString() {

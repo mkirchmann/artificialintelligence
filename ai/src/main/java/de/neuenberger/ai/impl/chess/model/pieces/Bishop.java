@@ -1,10 +1,8 @@
 package de.neuenberger.ai.impl.chess.model.pieces;
 
-import java.util.List;
-
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
-import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
+import de.neuenberger.ai.impl.chess.model.PlyList;
 import de.neuenberger.ai.impl.chess.model.bitboard.Position;
 import de.neuenberger.ai.impl.chess.model.piece.mover.DiagonalPlyFactory;
 
@@ -19,7 +17,7 @@ public class Bishop extends Piece {
 	}
 
 	@Override
-	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final Position position,
+	public void addPossiblePlies(final PlyList plies, final ChessBoard board, final Position position,
 			final boolean checkSaveness) {
 		factory.addPossiblePlies(plies, board, position, checkSaveness);
 	}

@@ -32,10 +32,7 @@ public abstract class PlyResult<ScoreType> implements Comparable<PlyResult> {
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("(" + score + ")");
-		for (final ChessPly ply : plies) {
-			builder.append(" ");
-			builder.append(ply);
-		}
+		appendPlies(builder);
 		return builder.toString();
 	}
 
@@ -54,6 +51,21 @@ public abstract class PlyResult<ScoreType> implements Comparable<PlyResult> {
 	 */
 	public int getPlyCount() {
 		return plies.size();
+	}
+
+	public String toMovesString() {
+		final StringBuilder builder = new StringBuilder();
+		appendPlies(builder);
+		return builder.toString();
+	}
+
+	public void appendPlies(final StringBuilder builder) {
+		for (final ChessPly ply : plies) {
+			if (builder.length() > 0) {
+				builder.append(" ");
+			}
+			builder.append(ply);
+		}
 	}
 
 }

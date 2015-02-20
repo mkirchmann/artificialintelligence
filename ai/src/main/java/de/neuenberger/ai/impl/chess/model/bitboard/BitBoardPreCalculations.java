@@ -1,5 +1,6 @@
 package de.neuenberger.ai.impl.chess.model.bitboard;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,21 +11,38 @@ import org.slf4j.LoggerFactory;
 
 public class BitBoardPreCalculations {
 	private final Position[] positions;
-	private List<Position>[] upperLeftDiagonal;
-	private List<Position>[] upperRightDiagonal;
-	private List<Position>[] lowerLeftDiagonal;
-	private List<Position>[] lowerRightDiagonal;
-	private List<Position>[] topVertical;
-	private List<Position>[] bottomVertical;
-	private List<Position>[] leftHorizontal;
-	private List<Position>[] rightHorizontal;
-	private List<Position>[] kingNormalFields;
-	private List<Position>[] knightMoves;
-	private List<Position>[] blackPawnNormalMoves;
-	private List<Position>[] whitePawnNormalMoves;
-	private List<Position>[] blackPawnCaptureMoves;
-	private List<Position>[] whitePawnCaptureMoves;
-	private Set<Position>[] attackCheckPositions;
+	private List<Position>[] upperLeftDiagonalPositionsList;
+	private List<Position>[] upperRightDiagonalPositionsList;
+	private List<Position>[] lowerLeftDiagonalPositionsList;
+	private List<Position>[] lowerRightDiagonalPositionsList;
+	private List<Position>[] topVerticalPositionsList;
+	private List<Position>[] bottomVerticalPositionsList;
+	private List<Position>[] leftHorizontalPositionsList;
+	private List<Position>[] rightHorizontalPositionsList;
+	private List<Position>[] kingNormalFieldsPositionsList;
+	private List<Position>[] knightMovesPositionsList;
+	private List<Position>[] blackPawnNormalMovesPositionsList;
+	private List<Position>[] whitePawnNormalMovesPositionsList;
+	private List<Position>[] blackPawnCaptureMovesPositionsList;
+	private List<Position>[] whitePawnCaptureMovesPositionsList;
+
+	private final long[] upperLeftDiagonal = new long[64];
+	private final long[] upperRightDiagonal = new long[64];
+	private final long[] lowerLeftDiagonal = new long[64];
+	private final long[] lowerRightDiagonal = new long[64];
+	private final long[] topVertical = new long[64];
+	private final long[] bottomVertical = new long[64];
+	private final long[] leftHorizontal = new long[64];
+	private final long[] rightHorizontal = new long[64];
+	private final long[] kingNormalFields = new long[64];
+	private final long[] knightMoves = new long[64];
+	private final long[] blackPawnNormalMoves = new long[64];
+	private final long[] whitePawnNormalMoves = new long[64];
+	private final long[] blackPawnCaptureMoves = new long[64];
+	private final long[] whitePawnCaptureMoves = new long[64];
+
+	private Set<Position>[] allPossibleAttackerPositionsPositionsList;
+	private final long[] allPossibleAttackerPositions = new long[64];
 	private static final BitBoardPreCalculations instance = new BitBoardPreCalculations();
 
 	private final int binarySearchDelta[] = new int[] { 16, 8, 4, 2, 1, 1, 1 };
@@ -48,98 +66,100 @@ public class BitBoardPreCalculations {
 		createKnightMoves();
 		createKingMoves();
 		createPawnMoves();
-		createAttackCheckPositions();
+		createAllPossibleAttackerPositions();
 	}
 
-	private void createAttackCheckPositions() {
-		attackCheckPositions = new Set[64];
+	private void createAllPossibleAttackerPositions() {
+		allPossibleAttackerPositionsPositionsList = new Set[64];
 		for (int i = 0; i < 64; i++) {
-			attackCheckPositions[i] = new HashSet<>();
-			attackCheckPositions[i].addAll(knightMoves[i]);
-			attackCheckPositions[i].addAll(topVertical[i]);
-			attackCheckPositions[i].addAll(bottomVertical[i]);
-			attackCheckPositions[i].addAll(rightHorizontal[i]);
-			attackCheckPositions[i].addAll(leftHorizontal[i]);
-			attackCheckPositions[i].addAll(leftHorizontal[i]);
-			attackCheckPositions[i].addAll(upperLeftDiagonal[i]);
-			attackCheckPositions[i].addAll(lowerLeftDiagonal[i]);
-			attackCheckPositions[i].addAll(upperRightDiagonal[i]);
-			attackCheckPositions[i].addAll(lowerRightDiagonal[i]);
+			allPossibleAttackerPositionsPositionsList[i] = new HashSet<>();
+			allPossibleAttackerPositionsPositionsList[i].addAll(knightMovesPositionsList[i]);
+			allPossibleAttackerPositionsPositionsList[i].addAll(topVerticalPositionsList[i]);
+			allPossibleAttackerPositionsPositionsList[i].addAll(bottomVerticalPositionsList[i]);
+			allPossibleAttackerPositionsPositionsList[i].addAll(rightHorizontalPositionsList[i]);
+			allPossibleAttackerPositionsPositionsList[i].addAll(leftHorizontalPositionsList[i]);
+			allPossibleAttackerPositionsPositionsList[i].addAll(leftHorizontalPositionsList[i]);
+			allPossibleAttackerPositionsPositionsList[i].addAll(upperLeftDiagonalPositionsList[i]);
+			allPossibleAttackerPositionsPositionsList[i].addAll(lowerLeftDiagonalPositionsList[i]);
+			allPossibleAttackerPositionsPositionsList[i].addAll(upperRightDiagonalPositionsList[i]);
+			allPossibleAttackerPositionsPositionsList[i].addAll(lowerRightDiagonalPositionsList[i]);
+			allPossibleAttackerPositions[i] = listToBitBoard(allPossibleAttackerPositionsPositionsList[i]);
 		}
+
 	}
 
 	private void createKingMoves() {
-		kingNormalFields = new List[64];
+		kingNormalFieldsPositionsList = new List[64];
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				final Position position = fromZeroBasedCoordinates(x, y);
-				kingNormalFields[position.getIdx()] = new LinkedList<>();
+				kingNormalFieldsPositionsList[position.getIdx()] = new LinkedList<>();
 
-				checkBoundsAndAdd(kingNormalFields[position.getIdx()], x + 1, y + 1);
-				checkBoundsAndAdd(kingNormalFields[position.getIdx()], x + 1, y);
-				checkBoundsAndAdd(kingNormalFields[position.getIdx()], x + 1, y - 1);
+				checkBoundsAndAdd(kingNormalFieldsPositionsList[position.getIdx()], x + 1, y + 1);
+				checkBoundsAndAdd(kingNormalFieldsPositionsList[position.getIdx()], x + 1, y);
+				checkBoundsAndAdd(kingNormalFieldsPositionsList[position.getIdx()], x + 1, y - 1);
 
-				checkBoundsAndAdd(kingNormalFields[position.getIdx()], x, y - 1);
-				checkBoundsAndAdd(kingNormalFields[position.getIdx()], x, y + 1);
+				checkBoundsAndAdd(kingNormalFieldsPositionsList[position.getIdx()], x, y - 1);
+				checkBoundsAndAdd(kingNormalFieldsPositionsList[position.getIdx()], x, y + 1);
 
-				checkBoundsAndAdd(kingNormalFields[position.getIdx()], x - 1, y + 1);
-				checkBoundsAndAdd(kingNormalFields[position.getIdx()], x - 1, y);
-				checkBoundsAndAdd(kingNormalFields[position.getIdx()], x - 1, y - 1);
+				checkBoundsAndAdd(kingNormalFieldsPositionsList[position.getIdx()], x - 1, y + 1);
+				checkBoundsAndAdd(kingNormalFieldsPositionsList[position.getIdx()], x - 1, y);
+				checkBoundsAndAdd(kingNormalFieldsPositionsList[position.getIdx()], x - 1, y - 1);
 			}
 		}
 	}
 
 	private void createKnightMoves() {
-		knightMoves = new List[64];
+		knightMovesPositionsList = new List[64];
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				final Position position = fromZeroBasedCoordinates(x, y);
-				knightMoves[position.getIdx()] = new LinkedList<>();
-				checkBoundsAndAdd(knightMoves[position.getIdx()], x + 1, y + 2);
-				checkBoundsAndAdd(knightMoves[position.getIdx()], x + 1, y - 2);
-				checkBoundsAndAdd(knightMoves[position.getIdx()], x - 1, y + 2);
-				checkBoundsAndAdd(knightMoves[position.getIdx()], x - 1, y - 2);
+				knightMovesPositionsList[position.getIdx()] = new LinkedList<>();
+				checkBoundsAndAdd(knightMovesPositionsList[position.getIdx()], x + 1, y + 2);
+				checkBoundsAndAdd(knightMovesPositionsList[position.getIdx()], x + 1, y - 2);
+				checkBoundsAndAdd(knightMovesPositionsList[position.getIdx()], x - 1, y + 2);
+				checkBoundsAndAdd(knightMovesPositionsList[position.getIdx()], x - 1, y - 2);
 
-				checkBoundsAndAdd(knightMoves[position.getIdx()], x + 2, y + 1);
-				checkBoundsAndAdd(knightMoves[position.getIdx()], x - 2, y + 1);
-				checkBoundsAndAdd(knightMoves[position.getIdx()], x + 2, y - 1);
-				checkBoundsAndAdd(knightMoves[position.getIdx()], x - 2, y - 1);
+				checkBoundsAndAdd(knightMovesPositionsList[position.getIdx()], x + 2, y + 1);
+				checkBoundsAndAdd(knightMovesPositionsList[position.getIdx()], x - 2, y + 1);
+				checkBoundsAndAdd(knightMovesPositionsList[position.getIdx()], x + 2, y - 1);
+				checkBoundsAndAdd(knightMovesPositionsList[position.getIdx()], x - 2, y - 1);
 			}
 		}
 	}
 
 	private void createStraights() {
-		topVertical = new List[64];
-		bottomVertical = new List[64];
-		leftHorizontal = new List[64];
-		rightHorizontal = new List[64];
+		topVerticalPositionsList = new List[64];
+		bottomVerticalPositionsList = new List[64];
+		leftHorizontalPositionsList = new List[64];
+		rightHorizontalPositionsList = new List[64];
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				final Position position = fromZeroBasedCoordinates(x, y);
-				topVertical[position.getIdx()] = new LinkedList<>();
-				bottomVertical[position.getIdx()] = new LinkedList<>();
-				leftHorizontal[position.getIdx()] = new LinkedList<>();
-				rightHorizontal[position.getIdx()] = new LinkedList<>();
+				topVerticalPositionsList[position.getIdx()] = new LinkedList<>();
+				bottomVerticalPositionsList[position.getIdx()] = new LinkedList<>();
+				leftHorizontalPositionsList[position.getIdx()] = new LinkedList<>();
+				rightHorizontalPositionsList[position.getIdx()] = new LinkedList<>();
 				for (int i = 1; i < 8; i++) {
-					if (!checkBoundsAndAdd(rightHorizontal[position.getIdx()], x + i, y)) {
+					if (!checkBoundsAndAdd(rightHorizontalPositionsList[position.getIdx()], x + i, y)) {
 						break;
 					}
 				}
 
 				for (int i = 1; i < 8; i++) {
-					if (!checkBoundsAndAdd(leftHorizontal[position.getIdx()], x - i, y)) {
+					if (!checkBoundsAndAdd(leftHorizontalPositionsList[position.getIdx()], x - i, y)) {
 						break;
 					}
 				}
 
 				for (int i = 1; i < 8; i++) {
-					if (!checkBoundsAndAdd(bottomVertical[position.getIdx()], x, y - i)) {
+					if (!checkBoundsAndAdd(bottomVerticalPositionsList[position.getIdx()], x, y - i)) {
 						break;
 					}
 				}
 
 				for (int i = 1; i < 8; i++) {
-					if (!checkBoundsAndAdd(topVertical[position.getIdx()], x, y + i)) {
+					if (!checkBoundsAndAdd(topVerticalPositionsList[position.getIdx()], x, y + i)) {
 						break;
 					}
 				}
@@ -149,70 +169,84 @@ public class BitBoardPreCalculations {
 	}
 
 	private void createDiagonals() {
-		upperLeftDiagonal = new List[64];
-		upperRightDiagonal = new List[64];
-		lowerLeftDiagonal = new List[64];
-		lowerRightDiagonal = new List[64];
+		upperLeftDiagonalPositionsList = new List[64];
+		upperRightDiagonalPositionsList = new List[64];
+		lowerLeftDiagonalPositionsList = new List[64];
+		lowerRightDiagonalPositionsList = new List[64];
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				final Position position = fromZeroBasedCoordinates(x, y);
-				upperLeftDiagonal[position.getIdx()] = new LinkedList<>();
-				upperRightDiagonal[position.getIdx()] = new LinkedList<>();
-				lowerLeftDiagonal[position.getIdx()] = new LinkedList<>();
-				lowerRightDiagonal[position.getIdx()] = new LinkedList<>();
+				upperLeftDiagonalPositionsList[position.getIdx()] = new LinkedList<>();
+				upperRightDiagonalPositionsList[position.getIdx()] = new LinkedList<>();
+				lowerLeftDiagonalPositionsList[position.getIdx()] = new LinkedList<>();
+				lowerRightDiagonalPositionsList[position.getIdx()] = new LinkedList<>();
 
 				for (int i = 1; i < 8; i++) {
-					if (!checkBoundsAndAdd(upperLeftDiagonal[position.getIdx()], x - i, y + i)) {
+					if (!checkBoundsAndAdd(upperLeftDiagonalPositionsList[position.getIdx()], x - i, y + i)) {
 						break;
 					}
 				}
+				upperLeftDiagonal[position.getIdx()] = listToBitBoard(upperLeftDiagonalPositionsList[position.getIdx()]);
 
 				for (int i = 1; i < 8; i++) {
-					if (!checkBoundsAndAdd(upperRightDiagonal[position.getIdx()], x + i, y + i)) {
+					if (!checkBoundsAndAdd(upperRightDiagonalPositionsList[position.getIdx()], x + i, y + i)) {
 						break;
 					}
 				}
+				upperRightDiagonal[position.getIdx()] = listToBitBoard(upperRightDiagonalPositionsList[position
+						.getIdx()]);
 
 				for (int i = 1; i < 8; i++) {
-					if (!checkBoundsAndAdd(lowerLeftDiagonal[position.getIdx()], x - i, y - i)) {
+					if (!checkBoundsAndAdd(lowerLeftDiagonalPositionsList[position.getIdx()], x - i, y - i)) {
 						break;
 					}
 				}
+				lowerLeftDiagonal[position.getIdx()] = listToBitBoard(lowerLeftDiagonalPositionsList[position.getIdx()]);
 
 				for (int i = 1; i < 8; i++) {
-					if (!checkBoundsAndAdd(lowerRightDiagonal[position.getIdx()], x + i, y - i)) {
+					if (!checkBoundsAndAdd(lowerRightDiagonalPositionsList[position.getIdx()], x + i, y - i)) {
 						break;
 					}
 				}
+				lowerRightDiagonal[position.getIdx()] = listToBitBoard(lowerRightDiagonalPositionsList[position
+						.getIdx()]);
 			}
 		}
 	}
 
+	public static long listToBitBoard(final Collection<Position> list) {
+		long result = 0l;
+		for (final Position position : list) {
+			result |= position.getFieldBit();
+		}
+		return result;
+	}
+
 	private void createPawnMoves() {
-		blackPawnNormalMoves = new List[64];
-		whitePawnNormalMoves = new List[64];
-		blackPawnCaptureMoves = new List[64];
-		whitePawnCaptureMoves = new List[64];
+		blackPawnNormalMovesPositionsList = new List[64];
+		whitePawnNormalMovesPositionsList = new List[64];
+		blackPawnCaptureMovesPositionsList = new List[64];
+		whitePawnCaptureMovesPositionsList = new List[64];
 
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				final Position position = fromZeroBasedCoordinates(x, y);
-				blackPawnNormalMoves[position.getIdx()] = new LinkedList<>();
-				whitePawnNormalMoves[position.getIdx()] = new LinkedList<>();
-				blackPawnCaptureMoves[position.getIdx()] = new LinkedList<>();
-				whitePawnCaptureMoves[position.getIdx()] = new LinkedList<>();
-				checkBoundsAndAdd(blackPawnNormalMoves[position.getIdx()], x, y - 1);
+				blackPawnNormalMovesPositionsList[position.getIdx()] = new LinkedList<>();
+				whitePawnNormalMovesPositionsList[position.getIdx()] = new LinkedList<>();
+				blackPawnCaptureMovesPositionsList[position.getIdx()] = new LinkedList<>();
+				whitePawnCaptureMovesPositionsList[position.getIdx()] = new LinkedList<>();
+				checkBoundsAndAdd(blackPawnNormalMovesPositionsList[position.getIdx()], x, y - 1);
 				if (y == 6) {
-					checkBoundsAndAdd(blackPawnNormalMoves[position.getIdx()], x, y - 2);
+					checkBoundsAndAdd(blackPawnNormalMovesPositionsList[position.getIdx()], x, y - 2);
 				}
-				checkBoundsAndAdd(blackPawnCaptureMoves[position.getIdx()], x + 1, y - 1);
-				checkBoundsAndAdd(blackPawnCaptureMoves[position.getIdx()], x - 1, y - 1);
-				checkBoundsAndAdd(whitePawnNormalMoves[position.getIdx()], x, y + 1);
+				checkBoundsAndAdd(blackPawnCaptureMovesPositionsList[position.getIdx()], x + 1, y - 1);
+				checkBoundsAndAdd(blackPawnCaptureMovesPositionsList[position.getIdx()], x - 1, y - 1);
+				checkBoundsAndAdd(whitePawnNormalMovesPositionsList[position.getIdx()], x, y + 1);
 				if (y == 1) {
-					checkBoundsAndAdd(whitePawnNormalMoves[position.getIdx()], x, y + 2);
+					checkBoundsAndAdd(whitePawnNormalMovesPositionsList[position.getIdx()], x, y + 2);
 				}
-				checkBoundsAndAdd(whitePawnCaptureMoves[position.getIdx()], x + 1, y + 1);
-				checkBoundsAndAdd(whitePawnCaptureMoves[position.getIdx()], x - 1, y + 1);
+				checkBoundsAndAdd(whitePawnCaptureMovesPositionsList[position.getIdx()], x + 1, y + 1);
+				checkBoundsAndAdd(whitePawnCaptureMovesPositionsList[position.getIdx()], x - 1, y + 1);
 			}
 		}
 	}
@@ -247,98 +281,98 @@ public class BitBoardPreCalculations {
 	 * @return the upperLeftDiagonal
 	 */
 	public List<Position> getUpperLeftDiagonal(final Position position) {
-		return upperLeftDiagonal[position.getIdx()];
+		return upperLeftDiagonalPositionsList[position.getIdx()];
 	}
 
 	/**
 	 * @return the upperRightDiagonal
 	 */
 	public List<Position> getUpperRightDiagonal(final Position position) {
-		return upperRightDiagonal[position.getIdx()];
+		return upperRightDiagonalPositionsList[position.getIdx()];
 	}
 
 	/**
 	 * @return the lowerLeftDiagonal
 	 */
 	public List<Position> getLowerLeftDiagonal(final Position position) {
-		return lowerLeftDiagonal[position.getIdx()];
+		return lowerLeftDiagonalPositionsList[position.getIdx()];
 	}
 
 	/**
 	 * @return the lowerRightDiagonal
 	 */
 	public List<Position> getLowerRightDiagonal(final Position position) {
-		return lowerRightDiagonal[position.getIdx()];
+		return lowerRightDiagonalPositionsList[position.getIdx()];
 	}
 
 	/**
 	 * @return the topVertical
 	 */
 	public List<Position> getTopVertical(final Position position) {
-		return topVertical[position.getIdx()];
+		return topVerticalPositionsList[position.getIdx()];
 	}
 
 	/**
 	 * @return the bottomVertical
 	 */
 	public List<Position> getBottomVertical(final Position position) {
-		return bottomVertical[position.getIdx()];
+		return bottomVerticalPositionsList[position.getIdx()];
 	}
 
 	/**
 	 * @return the leftHorizontal
 	 */
 	public List<Position> getLeftHorizontal(final Position position) {
-		return leftHorizontal[position.getIdx()];
+		return leftHorizontalPositionsList[position.getIdx()];
 	}
 
 	/**
 	 * @return the rightHorizontal
 	 */
 	public List<Position> getRightHorizontal(final Position position) {
-		return rightHorizontal[position.getIdx()];
+		return rightHorizontalPositionsList[position.getIdx()];
 	}
 
 	/**
 	 * @return the kingNormalFields
 	 */
 	public List<Position> getKingNormalFields(final Position position) {
-		return kingNormalFields[position.getIdx()];
+		return kingNormalFieldsPositionsList[position.getIdx()];
 	}
 
 	/**
 	 * @return the knightMoves
 	 */
 	public List<Position> getKnightMoves(final Position position) {
-		return knightMoves[position.getIdx()];
+		return knightMovesPositionsList[position.getIdx()];
 	}
 
 	/**
 	 * @return the blackPawnNormalMoves
 	 */
 	public List<Position> getBlackPawnNormalMoves(final Position position) {
-		return blackPawnNormalMoves[position.getIdx()];
+		return blackPawnNormalMovesPositionsList[position.getIdx()];
 	}
 
 	/**
 	 * @return the whitePawnNormalMoves
 	 */
 	public List<Position> getWhitePawnNormalMoves(final Position position) {
-		return whitePawnNormalMoves[position.getIdx()];
+		return whitePawnNormalMovesPositionsList[position.getIdx()];
 	}
 
 	/**
 	 * @return the blackPawnCaptureMoves
 	 */
 	public List<Position> getBlackPawnCaptureMoves(final Position position) {
-		return blackPawnCaptureMoves[position.getIdx()];
+		return blackPawnCaptureMovesPositionsList[position.getIdx()];
 	}
 
 	/**
 	 * @return the whitePawnCaptureMoves
 	 */
 	public List<Position> getWhitePawnCaptureMoves(final Position position) {
-		return whitePawnCaptureMoves[position.getIdx()];
+		return whitePawnCaptureMovesPositionsList[position.getIdx()];
 	}
 
 	public Position binarySearch(final long king) {
@@ -367,11 +401,179 @@ public class BitBoardPreCalculations {
 		return result;
 	}
 
+	public int binarySearchForIndex(final long king) {
+		int result = -1;
+		if (king == positionH8.getFieldBit()) {
+			result = positionH8.getIdx();
+		} else if (king == 0) {
+			// do nothing...
+		} else {
+			int currentIndex = 32;
+
+			for (int i = 0; i < binarySearchDelta.length; i++) {
+				final Position position = getPosition(currentIndex);
+				final long fieldBit = position.getFieldBit();
+				if (king == fieldBit) {
+					// found
+					result = currentIndex;
+					break;
+				} else if (king < fieldBit) {
+					currentIndex -= binarySearchDelta[i];
+				} else {
+					currentIndex += binarySearchDelta[i];
+				}
+			}
+		}
+		return result;
+	}
+
 	/**
 	 * @return the attackCheckPositions
 	 */
-	public Set<Position> getAttackCheckPositions(final Position position) {
-		return attackCheckPositions[position.getIdx()];
+	public Set<Position> getAllPossibleAttackerPositions(final Position position) {
+		return allPossibleAttackerPositionsPositionsList[position.getIdx()];
+	}
+
+	/**
+	 * @return the attackCheckPositions
+	 */
+	public Set<Position> getAllPossibleAttackerPositionsForIndex(final int fieldIndex) {
+		return allPossibleAttackerPositionsPositionsList[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the upperLeftDiagonal
+	 */
+	public long getUpperLeftDiagonal(final int fieldIndex) {
+		return upperLeftDiagonal[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the upperRightDiagonal
+	 */
+	public long getUpperRightDiagonal(final int fieldIndex) {
+		return upperRightDiagonal[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the lowerLeftDiagonal
+	 */
+	public long getLowerLeftDiagonal(final int fieldIndex) {
+		return lowerLeftDiagonal[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the lowerRightDiagonal
+	 */
+	public long getLowerRightDiagonal(final int fieldIndex) {
+		return lowerRightDiagonal[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the topVertical
+	 */
+	public long getTopVertical(final int fieldIndex) {
+		return topVertical[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the bottomVertical
+	 */
+	public long getBottomVertical(final int fieldIndex) {
+		return bottomVertical[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the leftHorizontal
+	 */
+	public long getLeftHorizontal(final int fieldIndex) {
+		return leftHorizontal[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the rightHorizontal
+	 */
+	public long getRightHorizontal(final int fieldIndex) {
+		return rightHorizontal[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the kingNormalFields
+	 */
+	public long getKingNormalFields(final int fieldIndex) {
+		return kingNormalFields[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the knightMoves
+	 */
+	public long getKnightMoves(final int fieldIndex) {
+		return knightMoves[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the blackPawnNormalMoves
+	 */
+	public long getBlackPawnNormalMoves(final int fieldIndex) {
+		return blackPawnNormalMoves[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the whitePawnNormalMoves
+	 */
+	public long getWhitePawnNormalMoves(final int fieldIndex) {
+		return whitePawnNormalMoves[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the blackPawnCaptureMoves
+	 */
+	public long getBlackPawnCaptureMoves(final int fieldIndex) {
+		return blackPawnCaptureMoves[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the whitePawnCaptureMoves
+	 */
+	public long getWhitePawnCaptureMoves(final int fieldIndex) {
+		return whitePawnCaptureMoves[fieldIndex];
+	}
+
+	/**
+	 * @param fieldIndex
+	 *            given index of the field
+	 * @return the allPossibleAttackerPositions
+	 */
+	public long getAllPossibleAttackerPositions(final int fieldIndex) {
+		return allPossibleAttackerPositions[fieldIndex];
 	}
 
 }

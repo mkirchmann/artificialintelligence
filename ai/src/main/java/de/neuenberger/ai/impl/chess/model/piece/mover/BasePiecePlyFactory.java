@@ -1,11 +1,10 @@
 package de.neuenberger.ai.impl.chess.model.piece.mover;
 
-import java.util.List;
-
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
+import de.neuenberger.ai.impl.chess.model.PlyList;
 import de.neuenberger.ai.impl.chess.model.bitboard.Position;
 
 public class BasePiecePlyFactory {
@@ -31,8 +30,8 @@ public class BasePiecePlyFactory {
 	 * @param checkOwnKingsafeness
 	 * @return Returns true if there was any piece.
 	 */
-	public boolean checkPieceAndAddPly(final List<ChessPly> plies, final ChessBoard board,
-			final Position source, final Position target, final boolean checkOwnKingsafeness) {
+	public boolean checkPieceAndAddPly(final PlyList plies, final ChessBoard board, final Position source,
+			final Position target, final boolean checkOwnKingsafeness) {
 		final boolean doBreak;
 		final Piece pieceAt = board.getPieceAt(target);
 		if (pieceAt != null) {
@@ -55,7 +54,7 @@ public class BasePiecePlyFactory {
 		return piece.getColor();
 	}
 
-	private void checkValidityOfPlyAndAdd(final List<ChessPly> plies, final ChessBoard board,
+	private void checkValidityOfPlyAndAdd(final PlyList plies, final ChessBoard board,
 			final boolean checkOwnKingsafeness, final ChessPly ply) {
 		final boolean add;
 		if (checkOwnKingsafeness) {

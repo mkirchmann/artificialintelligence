@@ -3,8 +3,8 @@ package de.neuenberger.ai.impl.chess.model.piece.mover;
 import java.util.List;
 
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
-import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
+import de.neuenberger.ai.impl.chess.model.PlyList;
 import de.neuenberger.ai.impl.chess.model.bitboard.Position;
 
 public class DiagonalPlyFactory extends BasePiecePlyFactory {
@@ -13,7 +13,7 @@ public class DiagonalPlyFactory extends BasePiecePlyFactory {
 		super(piece);
 	}
 
-	public void addPossiblePlies(final List<ChessPly> plies, final ChessBoard board, final Position source,
+	public void addPossiblePlies(final PlyList plies, final ChessBoard board, final Position source,
 			final boolean checkSaveness) {
 
 		List<Position> list = board.getUpperLeftDiagonal(source);
