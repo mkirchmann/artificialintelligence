@@ -55,7 +55,7 @@ public class BitBoardInstanceTest {
 		bitBoardInstance.movePiece(blackQueen, whiteRook, positionC2, positionC1); // captures
 		// other
 		// Queen.
-		Assertions.assertThat(bitBoardInstance.getPieceScore()).isEqualTo(-PieceType.QUEEN.getSimpleScore());
+		Assertions.assertThat(bitBoardInstance.getPieceScore()).isEqualTo(-PieceType.QUEEN.getCentiPawns());
 	}
 
 	@Test
@@ -63,7 +63,7 @@ public class BitBoardInstanceTest {
 		bitBoardInstance.setPiece(blackQueen, positionC1);
 		bitBoardInstance.setPiece(whitePawn, positionC2);
 		bitBoardInstance.setPiece(null, positionC1);
-		Assertions.assertThat(bitBoardInstance.getPieceScore()).isEqualTo(PieceType.PAWN.getSimpleScore());
+		Assertions.assertThat(bitBoardInstance.getPieceScore()).isEqualTo(PieceType.PAWN.getCentiPawns());
 	}
 
 	@Test

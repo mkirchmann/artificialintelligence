@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BitBoardPreCalculations {
+	private static final int NUMBER_OF_FIELDS = 64;
 	private final Position[] positions;
 	private List<Position>[] upperLeftDiagonalPositionsList;
 	private List<Position>[] upperRightDiagonalPositionsList;
@@ -26,24 +27,30 @@ public class BitBoardPreCalculations {
 	private List<Position>[] blackPawnCaptureMovesPositionsList;
 	private List<Position>[] whitePawnCaptureMovesPositionsList;
 
-	private final long[] upperLeftDiagonal = new long[64];
-	private final long[] upperRightDiagonal = new long[64];
-	private final long[] lowerLeftDiagonal = new long[64];
-	private final long[] lowerRightDiagonal = new long[64];
-	private final long[] topVertical = new long[64];
-	private final long[] bottomVertical = new long[64];
-	private final long[] leftHorizontal = new long[64];
-	private final long[] rightHorizontal = new long[64];
-	private final long[] kingNormalFields = new long[64];
-	private final long[] knightMoves = new long[64];
-	private final long[] blackPawnNormalMoves = new long[64];
-	private final long[] whitePawnNormalMoves = new long[64];
-	private final long[] blackPawnCaptureMoves = new long[64];
-	private final long[] whitePawnCaptureMoves = new long[64];
+	private final long[] upperLeftDiagonal = new long[NUMBER_OF_FIELDS];
+	private final long[] upperRightDiagonal = new long[NUMBER_OF_FIELDS];
+	private final long[] lowerLeftDiagonal = new long[NUMBER_OF_FIELDS];
+	private final long[] lowerRightDiagonal = new long[NUMBER_OF_FIELDS];
+	private final long[] topVertical = new long[NUMBER_OF_FIELDS];
+	private final long[] bottomVertical = new long[NUMBER_OF_FIELDS];
+	private final long[] leftHorizontal = new long[NUMBER_OF_FIELDS];
+	private final long[] rightHorizontal = new long[NUMBER_OF_FIELDS];
+	private final long[] kingNormalFields = new long[NUMBER_OF_FIELDS];
+	private final long[] knightMoves = new long[NUMBER_OF_FIELDS];
+	private final long[] blackPawnNormalMoves = new long[NUMBER_OF_FIELDS];
+	private final long[] whitePawnNormalMoves = new long[NUMBER_OF_FIELDS];
+	private final long[] blackPawnCaptureMoves = new long[NUMBER_OF_FIELDS];
+	private final long[] whitePawnCaptureMoves = new long[NUMBER_OF_FIELDS];
+	private final long[] knightDistanceTwo = new long[NUMBER_OF_FIELDS];
 
 	private Set<Position>[] allPossibleAttackerPositionsPositionsList;
-	private final long[] allPossibleAttackerPositions = new long[64];
+	private final long[] allPossibleAttackerPositions = new long[NUMBER_OF_FIELDS];
 	private static final BitBoardPreCalculations instance = new BitBoardPreCalculations();
+
+	private final long[] ranks = new long[8];
+	private final long[] ranksInverse = new long[8];
+	private final long[] files = new long[8];
+	private final long[] filesInverse = new long[8];
 
 	private final int binarySearchDelta[] = new int[] { 16, 8, 4, 2, 1, 1, 1 };
 
@@ -51,14 +58,20 @@ public class BitBoardPreCalculations {
 	private final Position positionH8;
 
 	private BitBoardPreCalculations() {
-		positions = new Position[64];
+		positions = new Position[NUMBER_OF_FIELDS];
 		final CoordinateX[] xCoordinates = CoordinateX.values();
 		int idx = 0;
 		for (int i = 1; i <= 8; i++) {
 			for (final CoordinateX coordinateX : xCoordinates) {
 				positions[idx] = new Position(coordinateX, i, idx);
+				ranks[i - 1] |= positions[idx].getFieldBit();
+				files[coordinateX.ordinal()] |= positions[idx].getFieldBit();
 				idx++;
 			}
+		}
+		for (int i = 0; i < 8; i++) {
+			ranksInverse[i] = ~ranks[i];
+			filesInverse[i] = ~files[i];
 		}
 		positionH8 = positions[63];
 		createDiagonals();
@@ -70,8 +83,8 @@ public class BitBoardPreCalculations {
 	}
 
 	private void createAllPossibleAttackerPositions() {
-		allPossibleAttackerPositionsPositionsList = new Set[64];
-		for (int i = 0; i < 64; i++) {
+		allPossibleAttackerPositionsPositionsList = new Set[NUMBER_OF_FIELDS];
+		for (int i = 0; i < NUMBER_OF_FIELDS; i++) {
 			allPossibleAttackerPositionsPositionsList[i] = new HashSet<>();
 			allPossibleAttackerPositionsPositionsList[i].addAll(knightMovesPositionsList[i]);
 			allPossibleAttackerPositionsPositionsList[i].addAll(topVerticalPositionsList[i]);
@@ -89,7 +102,7 @@ public class BitBoardPreCalculations {
 	}
 
 	private void createKingMoves() {
-		kingNormalFieldsPositionsList = new List[64];
+		kingNormalFieldsPositionsList = new List[NUMBER_OF_FIELDS];
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				final Position position = fromZeroBasedCoordinates(x, y);
@@ -110,7 +123,7 @@ public class BitBoardPreCalculations {
 	}
 
 	private void createKnightMoves() {
-		knightMovesPositionsList = new List[64];
+		knightMovesPositionsList = new List[NUMBER_OF_FIELDS];
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				final Position position = fromZeroBasedCoordinates(x, y);
@@ -126,13 +139,23 @@ public class BitBoardPreCalculations {
 				checkBoundsAndAdd(knightMovesPositionsList[position.getIdx()], x - 2, y - 1);
 			}
 		}
+		for (int i = 0; i < NUMBER_OF_FIELDS; i++) {
+			final Position sourcePosition = getPosition(i);
+			final List<Position> moves = getKnightMoves(sourcePosition);
+			final Set<Position> knightDistanceTwoPositions = new HashSet<>();
+			for (final Position distanceTwoPositions : moves) {
+				knightDistanceTwoPositions.addAll(getKnightMoves(sourcePosition));
+			}
+			knightDistanceTwoPositions.remove(sourcePosition);
+			knightDistanceTwo[i] = listToBitBoard(knightDistanceTwoPositions);
+		}
 	}
 
 	private void createStraights() {
-		topVerticalPositionsList = new List[64];
-		bottomVerticalPositionsList = new List[64];
-		leftHorizontalPositionsList = new List[64];
-		rightHorizontalPositionsList = new List[64];
+		topVerticalPositionsList = new List[NUMBER_OF_FIELDS];
+		bottomVerticalPositionsList = new List[NUMBER_OF_FIELDS];
+		leftHorizontalPositionsList = new List[NUMBER_OF_FIELDS];
+		rightHorizontalPositionsList = new List[NUMBER_OF_FIELDS];
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				final Position position = fromZeroBasedCoordinates(x, y);
@@ -169,10 +192,10 @@ public class BitBoardPreCalculations {
 	}
 
 	private void createDiagonals() {
-		upperLeftDiagonalPositionsList = new List[64];
-		upperRightDiagonalPositionsList = new List[64];
-		lowerLeftDiagonalPositionsList = new List[64];
-		lowerRightDiagonalPositionsList = new List[64];
+		upperLeftDiagonalPositionsList = new List[NUMBER_OF_FIELDS];
+		upperRightDiagonalPositionsList = new List[NUMBER_OF_FIELDS];
+		lowerLeftDiagonalPositionsList = new List[NUMBER_OF_FIELDS];
+		lowerRightDiagonalPositionsList = new List[NUMBER_OF_FIELDS];
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				final Position position = fromZeroBasedCoordinates(x, y);
@@ -223,10 +246,10 @@ public class BitBoardPreCalculations {
 	}
 
 	private void createPawnMoves() {
-		blackPawnNormalMovesPositionsList = new List[64];
-		whitePawnNormalMovesPositionsList = new List[64];
-		blackPawnCaptureMovesPositionsList = new List[64];
-		whitePawnCaptureMovesPositionsList = new List[64];
+		blackPawnNormalMovesPositionsList = new List[NUMBER_OF_FIELDS];
+		whitePawnNormalMovesPositionsList = new List[NUMBER_OF_FIELDS];
+		blackPawnCaptureMovesPositionsList = new List[NUMBER_OF_FIELDS];
+		whitePawnCaptureMovesPositionsList = new List[NUMBER_OF_FIELDS];
 
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
@@ -574,6 +597,50 @@ public class BitBoardPreCalculations {
 	 */
 	public long getAllPossibleAttackerPositions(final int fieldIndex) {
 		return allPossibleAttackerPositions[fieldIndex];
+	}
+
+	/**
+	 * @param rankIdx
+	 *            the rank index
+	 * @return the ranks
+	 */
+	public long getRanks(final int rankIdx) {
+		return ranks[rankIdx];
+	}
+
+	/**
+	 * @param rankIdx
+	 *            the rank index
+	 * @return the ranksInverse
+	 */
+	public long getRanksInverse(final int rankIdx) {
+		return ranksInverse[rankIdx];
+	}
+
+	/**
+	 * @param fileIdx
+	 *            File index
+	 * @return the files
+	 */
+	public long getFiles(final int fileIdx) {
+		return files[fileIdx];
+	}
+
+	/**
+	 * @param fileIdx
+	 *            File index
+	 * @return the filesInverse
+	 */
+	public long getFilesInverse(final int fileIdx) {
+		return filesInverse[fileIdx];
+	}
+
+	public long getKnightDistanceTwo(final Position target) {
+		return getKnightDistanceTwo(target.getIdx());
+	}
+
+	public long getKnightDistanceTwo(final int idx) {
+		return knightDistanceTwo[idx];
 	}
 
 }

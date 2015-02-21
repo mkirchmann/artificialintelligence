@@ -1,5 +1,6 @@
 package de.neuenberger.ai.impl.chess.model;
 
+import de.neuenberger.ai.impl.chess.model.Piece.PieceType;
 import de.neuenberger.ai.impl.chess.model.bitboard.Position;
 import de.neuenberger.ai.impl.chess.model.pieces.Pawn;
 
@@ -138,6 +139,24 @@ public class ChessPly implements ChessBoardModifier {
 			result += capturedPiece.getSimpleScore() - piece.getSimpleScore();
 		}
 		return result;
+	}
+
+	/**
+	 * @return the sourceFieldBit
+	 */
+	public long getSourceFieldBit() {
+		return source.getFieldBit();
+	}
+
+	/**
+	 * @return the targetFieldBit
+	 */
+	public long getTargetFieldBit() {
+		return target.getFieldBit();
+	}
+
+	public PieceType getPieceType() {
+		return piece.getPieceType();
 	}
 
 }

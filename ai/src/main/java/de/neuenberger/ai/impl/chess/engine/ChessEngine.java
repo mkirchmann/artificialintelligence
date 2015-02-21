@@ -22,6 +22,10 @@ public class ChessEngine {
 
 	MoveSortingStrategy strategy;
 
+	public ChessEngine(final ChessBoard board, final int recursions) {
+		this(buildStrategy(), board, board.getWhosToMove(), recursions);
+	}
+
 	public ChessEngine(final ChessBoard board, final Color seekBestMoveFor, final int recursions) {
 		this(buildStrategy(), board, seekBestMoveFor, recursions);
 	}

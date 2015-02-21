@@ -123,7 +123,7 @@ public class BitBoardInstance {
 		final PieceType[] values = PieceType.values();
 		int sum = 0;
 		for (final PieceType pieceType : values) {
-			sum += pieceType.getSimpleScore()
+			sum += pieceType.getCentiPawns()
 					* (Long.bitCount(pieceBitBoard[0][pieceType.ordinal()]) - Long.bitCount(pieceBitBoard[1][pieceType
 							.ordinal()]));
 		}
@@ -206,6 +206,22 @@ public class BitBoardInstance {
 				result += debugLong(pieceBitBoard[color.ordinal()][pieceType.ordinal()]);
 				result += "\n";
 			}
+		}
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param color
+	 * @return Returns a bitmask of all positions defended by a pawn.
+	 */
+	public long getPawnDefendedFields(final Color color) {
+		final long pawnBoard = getPieceBitBoard(color, PieceType.PAWN);
+		long result;
+		if (color == Color.BLACK) {
+			result = (pawnBoard & instance.getRanksInverse(7)) >> 7 | (pawnBoard & instance.getRanksInverse(0)) >> 9;
+		} else {
+			result = (pawnBoard & instance.getRanksInverse(0)) << 7 | (pawnBoard & instance.getRanksInverse(7)) << 9;
 		}
 		return result;
 	}

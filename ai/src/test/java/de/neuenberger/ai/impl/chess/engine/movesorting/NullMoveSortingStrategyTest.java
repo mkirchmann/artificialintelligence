@@ -14,7 +14,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
+import de.neuenberger.ai.impl.chess.model.Piece;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
+import de.neuenberger.ai.impl.chess.model.bitboard.BitBoardInstance;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NullMoveSortingStrategyTest {
@@ -23,8 +25,14 @@ public class NullMoveSortingStrategyTest {
 	@Mock
 	private ChessBoard chessBoard;
 
+	@Mock
+	BitBoardInstance bitBoardInstance;
+
 	@Before
 	public void before() {
+
+		Mockito.when(chessBoard.getBitBoardInstance()).thenReturn(bitBoardInstance);
+
 		strategy = new NullMoveSortingStrategy();
 
 	}
@@ -32,19 +40,20 @@ public class NullMoveSortingStrategyTest {
 	@Test
 	public void testMoveOrder() throws Exception {
 		final Color black = Color.BLACK;
-		final ChessPly ply100 = createPly(100);
-		final ChessPly ply101 = createPly(101);
-		final ChessPly ply90 = createPly(90);
-		final ChessPly ply103 = createPly(103);
-		final ChessPly ply70 = createPly(70);
-		final ChessPly noAdvantage1 = createPly(0);
-		final ChessPly noAdvantage2 = createPly(0);
-		final ChessPly noAdvantage3 = createPly(0);
-		final ChessPly noAdvantage4 = createPly(0);
+		final Piece piece = Mockito.mock(Piece.class);
+		final ChessPly ply100 = createPly(piece, 100);
+		final ChessPly ply101 = createPly(piece, 101);
+		final ChessPly ply90 = createPly(piece, 90);
+		final ChessPly ply103 = createPly(piece, 103);
+		final ChessPly ply70 = createPly(piece, 70);
+		final ChessPly noAdvantage1 = createPly(piece, 0);
+		final ChessPly noAdvantage2 = createPly(piece, 0);
+		final ChessPly noAdvantage3 = createPly(piece, 0);
+		final ChessPly noAdvantage4 = createPly(piece, 0);
 
-		final ChessPly createPlyA = createPly(10);
-		final ChessPly createPlyB = createPly(0);
-		final ChessPly createPlyC = createPly(30);
+		final ChessPly createPlyA = createPly(piece, 10);
+		final ChessPly createPlyB = createPly(piece, 0);
+		final ChessPly createPlyC = createPly(piece, 30);
 
 		final ChessBoard board1 = Mockito.mock(ChessBoard.class);
 		final ChessBoard board2 = Mockito.mock(ChessBoard.class);
@@ -72,8 +81,9 @@ public class NullMoveSortingStrategyTest {
 
 	}
 
-	private ChessPly createPly(final int score) {
+	private ChessPly createPly(final Piece piece, final int score) {
 		final ChessPly mock = Mockito.mock(ChessPly.class);
+		Mockito.when(mock.getPiece()).thenReturn(piece);
 		Mockito.when(mock.getMoveDeltaScore()).thenReturn(score);
 		return mock;
 	}
