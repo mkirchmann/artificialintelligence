@@ -24,6 +24,12 @@ public abstract class PlyResult<ScoreType> implements Comparable<PlyResult> {
 		return score;
 	}
 
+	/**
+	 * Inserts the given ply to this result at the first position
+	 * 
+	 * @param ply
+	 *            given ply
+	 */
 	public void insertPly(final ChessPly ply) {
 		plies.add(0, ply);
 	}
@@ -66,6 +72,10 @@ public abstract class PlyResult<ScoreType> implements Comparable<PlyResult> {
 			}
 			builder.append(ply);
 		}
+	}
+
+	public ChessPly getPly(final int i) {
+		return plies.get(i);
 	}
 
 }

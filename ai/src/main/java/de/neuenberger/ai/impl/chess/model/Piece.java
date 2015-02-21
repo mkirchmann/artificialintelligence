@@ -33,10 +33,12 @@ public abstract class Piece implements Serializable {
 		KING('K', 100000), QUEEN('Q', 830), ROOK('R', 500), BISHOP('B', 300), KNIGHT('N', 300), PAWN('P', 100);
 		private final char representation;
 		private final int centiPawns;
+		private final int halfCentiPawns;
 
 		PieceType(final char representation, final int simpleScore) {
 			this.representation = representation;
 			this.centiPawns = simpleScore;
+			this.halfCentiPawns = centiPawns / 2;
 		}
 
 		/**
@@ -51,6 +53,10 @@ public abstract class Piece implements Serializable {
 		 */
 		public int getCentiPawns() {
 			return centiPawns;
+		}
+
+		public int getHalfCentiPawns() {
+			return halfCentiPawns;
 		}
 	}
 
@@ -91,7 +97,7 @@ public abstract class Piece implements Serializable {
 	/**
 	 * @return the simpleScore
 	 */
-	public int getSimpleScore() {
+	public int getCentiPawns() {
 		return pieceType.getCentiPawns();
 	}
 
@@ -103,6 +109,10 @@ public abstract class Piece implements Serializable {
 
 	public PieceType getPieceType() {
 		return pieceType;
+	}
+
+	public int getHalfCentiPawns() {
+		return pieceType.getHalfCentiPawns();
 	}
 
 }

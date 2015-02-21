@@ -35,6 +35,6 @@ public class PromotionPly extends ChessPly {
 
 	@Override
 	public int calculatedMoveDeltaScore() {
-		return super.calculatedMoveDeltaScore() + newPiece.getSimpleScore();
+		return super.calculatedMoveDeltaScore() + newPiece.getCentiPawns();
 	}
 }

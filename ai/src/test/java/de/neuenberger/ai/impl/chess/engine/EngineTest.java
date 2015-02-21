@@ -195,6 +195,14 @@ public class EngineTest {
 		assertThat(bestMove.toString()).isEqualTo(toStringMoveSeries);
 	}
 
+	private PlyResult findBestMove(final String fen, final int plies, final int recursions) {
+		final ChessBoard setupByFEN = factory.setupByFEN(fen);
+		final ChessEngine engine = new ChessEngine(setupByFEN, plies);
+
+		final PlyResult bestMove = engine.getBestMoveIterativeDeepening(recursions);
+		return bestMove;
+	}
+
 	private PlyResult findBestMove(final String fen, final int plies) {
 		final ChessBoard setupByFEN = factory.setupByFEN(fen);
 		final ChessEngine engine = new ChessEngine(setupByFEN, plies);
@@ -218,7 +226,7 @@ public class EngineTest {
 	@Test
 	public void testNearlyMate() {
 		final PlyResult findBestMove = findBestMove("7R/2pr4/2n3B1/8/1kP5/1P6/PK6/1N3r2 w", 5);
-		patternMatchMove(findBestMove, ANY_NUMERIC_RATING + "Rh8-h5");
+		assertThat(findBestMove.toMovesString()).startsWith("Rh8-h5 ");
 	}
 
 	@Test
@@ -260,7 +268,7 @@ public class EngineTest {
 
 	@Test
 	public void testPawnFork() {
-		final PlyResult plyResult = findBestMove("8/pkp5/1p6/1n1q4/5R2/1P1N1R2/PKP5/8 w", 4);
+		final PlyResult plyResult = findBestMove("8/pkp5/1p6/1n1q4/5R2/1P1N1R2/PKP5/8 w", 3);
 		assertThat(plyResult.toMovesString()).startsWith("c2-c4 Qd5-").endsWith("c4xb5");
 	}
 
@@ -273,7 +281,7 @@ public class EngineTest {
 	@Test
 	public void testBishopSkewerWithAttack() {
 		final PlyResult plyResult = findBestMove("6k1/8/8/3q4/8/2K5/4B3/5R2 w", 3);
-		assertThat(plyResult.toMovesString()).startsWith("Be2-c4 Qd5xc4+ ");
+		assertThat(plyResult.toMovesString()).startsWith("Be2-c4 Qd5xc4+");
 	}
 
 	@Test
@@ -298,6 +306,24 @@ public class EngineTest {
 	public void testClosePositionForADraw() {
 		final PlyResult plyResult = findBestMove("k1b5/8/p7/Pp1p1p2/1P2pPpK/3PP1P1/8/8 w", 5);
 		assertThat(plyResult.toMovesString()).startsWith("d3-d4 ");
+	}
+
+	@Test
+	public void testDontLoseLastPawn() {
+		final PlyResult findBestMove = findBestMove("8/8/1K1N4/P7/8/3b4/2k5/8 w", 5);
+		assertThat(findBestMove.toMovesString()).startsWith("Nd6-b5 ").endsWith("a6-a7");
+	}
+
+	@Test
+	public void testDontLoseLastPawn2() {
+		final PlyResult plyResult = findBestMove("8/8/PK6/1N6/1k6/3b4/8/8 w", 5, 3);
+		assertThat(plyResult.toMovesString()).startsWith("a6-a7 Bd3-e4 Nb5-d6 Be4-a8 Nd6-b7");
+	}
+
+	@Test
+	public void testPromotePawn() {
+		final PlyResult bestMove = findBestMove("8/PN6/1K6/8/1k2b3/8/8/8 w", 3);
+		assertThat(bestMove.toMovesString()).startsWith("a7-a8Q ");
 	}
 
 	private void patternMatchMove(final PlyResult findBestMove, final String regex) {

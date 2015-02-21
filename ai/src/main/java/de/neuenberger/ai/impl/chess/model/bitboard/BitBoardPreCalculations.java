@@ -52,6 +52,9 @@ public class BitBoardPreCalculations {
 	private final long[] files = new long[8];
 	private final long[] filesInverse = new long[8];
 
+	private final long whiteFields;
+	private final long blackFields;
+
 	private final int binarySearchDelta[] = new int[] { 16, 8, 4, 2, 1, 1, 1 };
 
 	Logger log = LoggerFactory.getLogger(getClass());
@@ -61,11 +64,19 @@ public class BitBoardPreCalculations {
 		positions = new Position[NUMBER_OF_FIELDS];
 		final CoordinateX[] xCoordinates = CoordinateX.values();
 		int idx = 0;
+		long tempBlackFields = 0;
+		long tempWhiteFields = 0;
 		for (int i = 1; i <= 8; i++) {
 			for (final CoordinateX coordinateX : xCoordinates) {
 				positions[idx] = new Position(coordinateX, i, idx);
 				ranks[i - 1] |= positions[idx].getFieldBit();
 				files[coordinateX.ordinal()] |= positions[idx].getFieldBit();
+				final int blackOrWhite = (i - 1 + coordinateX.ordinal()) % 2;
+				if (blackOrWhite == 0) {
+					tempBlackFields |= positions[idx].getFieldBit();
+				} else {
+					tempWhiteFields |= positions[idx].getFieldBit();
+				}
 				idx++;
 			}
 		}
@@ -80,6 +91,9 @@ public class BitBoardPreCalculations {
 		createKingMoves();
 		createPawnMoves();
 		createAllPossibleAttackerPositions();
+
+		whiteFields = tempWhiteFields;
+		blackFields = tempBlackFields;
 	}
 
 	private void createAllPossibleAttackerPositions() {
@@ -143,8 +157,8 @@ public class BitBoardPreCalculations {
 			final Position sourcePosition = getPosition(i);
 			final List<Position> moves = getKnightMoves(sourcePosition);
 			final Set<Position> knightDistanceTwoPositions = new HashSet<>();
-			for (final Position distanceTwoPositions : moves) {
-				knightDistanceTwoPositions.addAll(getKnightMoves(sourcePosition));
+			for (final Position distanceOneKnightPositions : moves) {
+				knightDistanceTwoPositions.addAll(getKnightMoves(distanceOneKnightPositions));
 			}
 			knightDistanceTwoPositions.remove(sourcePosition);
 			knightDistanceTwo[i] = listToBitBoard(knightDistanceTwoPositions);
@@ -641,6 +655,14 @@ public class BitBoardPreCalculations {
 
 	public long getKnightDistanceTwo(final int idx) {
 		return knightDistanceTwo[idx];
+	}
+
+	public long getWhiteFields() {
+		return whiteFields;
+	}
+
+	public long getBlackFields() {
+		return blackFields;
 	}
 
 }

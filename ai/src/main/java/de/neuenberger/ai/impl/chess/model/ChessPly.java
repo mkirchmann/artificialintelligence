@@ -136,7 +136,7 @@ public class ChessPly implements ChessBoardModifier {
 			result += 5;
 		}
 		if (capture) {
-			result += capturedPiece.getSimpleScore() - piece.getSimpleScore();
+			result += capturedPiece.getCentiPawns() - piece.getCentiPawns();
 		}
 		return result;
 	}

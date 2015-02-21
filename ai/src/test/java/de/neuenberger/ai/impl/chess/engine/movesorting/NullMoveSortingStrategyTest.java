@@ -16,6 +16,7 @@ import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.Piece;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
+import de.neuenberger.ai.impl.chess.model.Piece.PieceType;
 import de.neuenberger.ai.impl.chess.model.bitboard.BitBoardInstance;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -41,6 +42,7 @@ public class NullMoveSortingStrategyTest {
 	public void testMoveOrder() throws Exception {
 		final Color black = Color.BLACK;
 		final Piece piece = Mockito.mock(Piece.class);
+		Mockito.when(piece.getPieceType()).thenReturn(PieceType.PAWN);
 		final ChessPly ply100 = createPly(piece, 100);
 		final ChessPly ply101 = createPly(piece, 101);
 		final ChessPly ply90 = createPly(piece, 90);
@@ -84,6 +86,8 @@ public class NullMoveSortingStrategyTest {
 	private ChessPly createPly(final Piece piece, final int score) {
 		final ChessPly mock = Mockito.mock(ChessPly.class);
 		Mockito.when(mock.getPiece()).thenReturn(piece);
+		final PieceType pieceType = piece.getPieceType();
+		Mockito.when(mock.getPieceType()).thenReturn(pieceType);
 		Mockito.when(mock.getMoveDeltaScore()).thenReturn(score);
 		return mock;
 	}

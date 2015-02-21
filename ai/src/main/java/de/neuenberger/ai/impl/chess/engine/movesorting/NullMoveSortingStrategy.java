@@ -12,6 +12,7 @@ import de.neuenberger.ai.impl.chess.model.ChessPly;
 import de.neuenberger.ai.impl.chess.model.ChessPlyMScoreComparator;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
 import de.neuenberger.ai.impl.chess.model.Piece.PieceType;
+import de.neuenberger.ai.impl.chess.model.bitboard.BitBoardInstance;
 import de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations;
 import de.neuenberger.ai.impl.chess.model.plies.RatedPly;
 
@@ -46,25 +47,73 @@ public class NullMoveSortingStrategy extends AbstractMoveSortingStrategy {
 		result.addAll(simpleScoredMoves);
 
 		if (movesForNullMovePruning.size() > 1) {
-			final long defendedFields = chessBoard.getBitBoardInstance().getPawnDefendedFields(
-					colorToMove.getOtherColor());
+			final Color opponentColor = colorToMove.getOtherColor();
+			final BitBoardInstance currentBoardBitBoard = chessBoard.getBitBoardInstance();
+			final long pawnDefendedFields = currentBoardBitBoard.getPawnDefendedFields(opponentColor);
 			final List<RatedPly> scoredMoves = new ArrayList<>(movesForNullMovePruning.size());
+			final long opponentKnights = currentBoardBitBoard.getPieceBitBoard(opponentColor, PieceType.KNIGHT);
+			final Boolean attackedByRorB[] = new Boolean[64];
+			final Boolean aboutToBeAttackedByRorB[] = new Boolean[64];
 			for (final ChessPly chessPly : movesForNullMovePruning) {
 				final ChessBoard board = chessBoard.apply(chessPly);
 				final List<ChessPly> possiblePlies = board.getPossiblePlies(colorToMove);
 				Integer moveScore = 0;
 				if (chessPly.getPieceType() != PieceType.PAWN) {
-					if ((chessPly.getTargetFieldBit() & defendedFields) != 0) {
-						moveScore -= 100 + chessPly.getPiece().getSimpleScore();
+					final int pieceCentiPawns = chessPly.getPiece().getCentiPawns();
+					final int halfPieceCentiPawns = chessPly.getPiece().getHalfCentiPawns();
+					if ((chessPly.getTargetFieldBit() & pawnDefendedFields) != 0) {
+						moveScore -= 100 + pieceCentiPawns;
 					}
-					if ((chessPly.getSourceFieldBit() & defendedFields) != 0) {
-						moveScore += 100 + chessPly.getPiece().getSimpleScore();
+					if ((chessPly.getSourceFieldBit() & pawnDefendedFields) != 0) {
+						moveScore += 100 + pieceCentiPawns;
 					}
+
+					if (opponentKnights != 0 && chessPly.getPieceType().ordinal() <= PieceType.ROOK.ordinal()) {
+						// for Rook or more important piece
+						final int sourceFieldIdx = chessPly.getSource().getIdx();
+						if (attackedByRorB[sourceFieldIdx] == null) {
+							final long sourceKnightMovesAttackers = instance.getKnightMoves(sourceFieldIdx);
+							attackedByRorB[sourceFieldIdx] = ((sourceKnightMovesAttackers & opponentKnights) != 0);
+						}
+						if (aboutToBeAttackedByRorB[sourceFieldIdx] == null) {
+							final long knightDistanceTwoForSource = instance.getKnightDistanceTwo(sourceFieldIdx);
+							aboutToBeAttackedByRorB[sourceFieldIdx] = ((knightDistanceTwoForSource & opponentKnights) != 0);
+						}
+						final int targetFieldIdx = chessPly.getTarget().getIdx();
+						if (attackedByRorB[targetFieldIdx] == null) {
+							final long targetKnightMovesAttackers = instance.getKnightMoves(targetFieldIdx);
+							attackedByRorB[targetFieldIdx] = ((targetKnightMovesAttackers & opponentKnights) != 0);
+						}
+						if (aboutToBeAttackedByRorB[targetFieldIdx] == null) {
+							final long knightDistanceTwoForTarget = instance.getKnightDistanceTwo(targetFieldIdx);
+							aboutToBeAttackedByRorB[targetFieldIdx] = ((knightDistanceTwoForTarget & opponentKnights) != 0);
+						}
+
+						if (attackedByRorB[sourceFieldIdx]) {
+							// source field attacked by knight
+							moveScore += pieceCentiPawns;
+						}
+						if (attackedByRorB[targetFieldIdx]) {
+							// target field attacked by knight
+							moveScore -= pieceCentiPawns;
+						}
+
+						if (aboutToBeAttackedByRorB[sourceFieldIdx]) {
+							// source field can be attacked by knight in one
+							// move
+							moveScore += halfPieceCentiPawns;
+						}
+						if (aboutToBeAttackedByRorB[targetFieldIdx]) {
+							// target field can be attacked by knight one move
+							moveScore -= halfPieceCentiPawns;
+						}
+					}
+
 				} else {
-					instance.getKnightDistanceTwo(chessPly.getTarget());
+
 				}
 				for (final ChessPly chessPly2 : possiblePlies) {
-					moveScore += chessPly2.getMoveDeltaScore();
+					moveScore += chessPly2.getMoveDeltaScore() + 1;
 				}
 				scoredMoves.add(new RatedPly(chessPly, moveScore));
 			}

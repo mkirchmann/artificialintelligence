@@ -1,5 +1,7 @@
 package de.neuenberger.ai.impl.chess.model.bitboard;
 
+import java.util.Arrays;
+
 import de.neuenberger.ai.impl.chess.model.Piece;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
 import de.neuenberger.ai.impl.chess.model.Piece.PieceType;
@@ -224,5 +226,41 @@ public class BitBoardInstance {
 			result = (pawnBoard & instance.getRanksInverse(0)) << 7 | (pawnBoard & instance.getRanksInverse(7)) << 9;
 		}
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(colorBitBoard);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final BitBoardInstance other = (BitBoardInstance) obj;
+		if (!Arrays.equals(colorBitBoard, other.colorBitBoard)) {
+			return false;
+		}
+		if (!Arrays.deepEquals(pieceBitBoard, other.pieceBitBoard)) {
+			return false;
+		}
+		return true;
 	}
 }

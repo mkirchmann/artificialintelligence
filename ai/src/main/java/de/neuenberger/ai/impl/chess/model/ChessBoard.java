@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import de.neuenberger.ai.base.model.Board;
 import de.neuenberger.ai.impl.chess.model.Piece.Color;
+import de.neuenberger.ai.impl.chess.model.Piece.PieceType;
 import de.neuenberger.ai.impl.chess.model.bitboard.BitBoardInstance;
 import de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations;
 import de.neuenberger.ai.impl.chess.model.bitboard.Position;
@@ -19,7 +20,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	private ChessPly lastPly;
 	private boolean check;
 	private Color whosToMove = Color.WHITE;
-	private final BitBoardPreCalculations bitBoard;
+	private static final BitBoardPreCalculations bitBoardPreCalculations = BitBoardPreCalculations.getInstance();
 	private final BitBoardInstance bitBoardInstance;
 	static IsInCheckCalculationStrategy isInCheckUseBitBoardStrategy = new IsInCheckUseBitBoard();
 	// static IsInCheckCalculationStrategy isInCheckUseBitBoardStrategy = new
@@ -28,13 +29,12 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	Logger log = LoggerFactory.getLogger(getClass());
 
 	public ChessBoard() {
-		this(new BitBoardInstance(BitBoardPreCalculations.getInstance()));
+		this(new BitBoardInstance(bitBoardPreCalculations));
 	}
 
 	public ChessBoard(final BitBoardInstance bitBoardInstance) {
 		this.bitBoardInstance = bitBoardInstance;
 		boardContents = new Piece[64];
-		bitBoard = BitBoardPreCalculations.getInstance();
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 		for (int i = 0; i < 64; i++) {
 			final Piece piece = boardContents[i];
 			if (piece != null && piece.getColor() == color) {
-				piece.addPossiblePlies(plyList, this, bitBoard.getPosition(i), true);
+				piece.addPossiblePlies(plyList, this, bitBoardPreCalculations.getPosition(i), true);
 			}
 		}
 		return plyList.getCollection();
@@ -229,7 +229,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getUpperLeftDiagonal(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getUpperLeftDiagonal(final Position position) {
-		return bitBoard.getUpperLeftDiagonal(position);
+		return bitBoardPreCalculations.getUpperLeftDiagonal(position);
 	}
 
 	/**
@@ -238,7 +238,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getUpperRightDiagonal(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getUpperRightDiagonal(final Position position) {
-		return bitBoard.getUpperRightDiagonal(position);
+		return bitBoardPreCalculations.getUpperRightDiagonal(position);
 	}
 
 	/**
@@ -247,7 +247,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getLowerLeftDiagonal(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getLowerLeftDiagonal(final Position position) {
-		return bitBoard.getLowerLeftDiagonal(position);
+		return bitBoardPreCalculations.getLowerLeftDiagonal(position);
 	}
 
 	/**
@@ -256,7 +256,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getLowerRightDiagonal(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getLowerRightDiagonal(final Position position) {
-		return bitBoard.getLowerRightDiagonal(position);
+		return bitBoardPreCalculations.getLowerRightDiagonal(position);
 	}
 
 	/**
@@ -265,7 +265,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getTopVertical(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getTopVertical(final Position position) {
-		return bitBoard.getTopVertical(position);
+		return bitBoardPreCalculations.getTopVertical(position);
 	}
 
 	/**
@@ -274,7 +274,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getBottomVertical(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getBottomVertical(final Position position) {
-		return bitBoard.getBottomVertical(position);
+		return bitBoardPreCalculations.getBottomVertical(position);
 	}
 
 	/**
@@ -283,7 +283,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getLeftHorizontal(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getLeftHorizontal(final Position position) {
-		return bitBoard.getLeftHorizontal(position);
+		return bitBoardPreCalculations.getLeftHorizontal(position);
 	}
 
 	/**
@@ -292,7 +292,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getRightHorizontal(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getRightHorizontal(final Position position) {
-		return bitBoard.getRightHorizontal(position);
+		return bitBoardPreCalculations.getRightHorizontal(position);
 	}
 
 	/**
@@ -301,7 +301,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getKingNormalFields(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getKingNormalFields(final Position position) {
-		return bitBoard.getKingNormalFields(position);
+		return bitBoardPreCalculations.getKingNormalFields(position);
 	}
 
 	/**
@@ -310,11 +310,11 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getKnightMoves(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getKnightMoves(final Position position) {
-		return bitBoard.getKnightMoves(position);
+		return bitBoardPreCalculations.getKnightMoves(position);
 	}
 
 	public Position fromPosition(final int x, final int y) {
-		return bitBoard.fromZeroBasedCoordinates(x, y);
+		return bitBoardPreCalculations.fromZeroBasedCoordinates(x, y);
 	}
 
 	public Piece getPieceAt(final int i) {
@@ -327,7 +327,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getBlackPawnNormalMoves(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getBlackPawnNormalMoves(final Position position) {
-		return bitBoard.getBlackPawnNormalMoves(position);
+		return bitBoardPreCalculations.getBlackPawnNormalMoves(position);
 	}
 
 	/**
@@ -336,7 +336,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getWhitePawnNormalMoves(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getWhitePawnNormalMoves(final Position position) {
-		return bitBoard.getWhitePawnNormalMoves(position);
+		return bitBoardPreCalculations.getWhitePawnNormalMoves(position);
 	}
 
 	/**
@@ -345,7 +345,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getBlackPawnCaptureMoves(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getBlackPawnCaptureMoves(final Position position) {
-		return bitBoard.getBlackPawnCaptureMoves(position);
+		return bitBoardPreCalculations.getBlackPawnCaptureMoves(position);
 	}
 
 	/**
@@ -354,7 +354,7 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 * @see de.neuenberger.ai.impl.chess.model.bitboard.BitBoardPreCalculations#getWhitePawnCaptureMoves(de.neuenberger.ai.impl.chess.model.BitBoardPreCalculations.Position)
 	 */
 	public List<Position> getWhitePawnCaptureMoves(final Position position) {
-		return bitBoard.getWhitePawnCaptureMoves(position);
+		return bitBoardPreCalculations.getWhitePawnCaptureMoves(position);
 	}
 
 	public int getScore() {
@@ -366,6 +366,64 @@ public class ChessBoard implements Board<Piece, Color, ChessPly> {
 	 */
 	public BitBoardInstance getBitBoardInstance() {
 		return bitBoardInstance;
+	}
+
+	public boolean hasEnoughMatingMaterial() {
+		return hasEnoughMatingMaterial(Color.WHITE) || hasEnoughMatingMaterial(Color.BLACK);
+	}
+
+	public boolean hasEnoughMatingMaterial(final Color color) {
+		boolean result;
+		final long pawns = bitBoardInstance.getPieceBitBoard(color, PieceType.PAWN);
+		if (pawns == 0) {
+			// no more pawns.
+
+			if (bitBoardInstance.getPieceBitBoard(color, PieceType.QUEEN) == 0
+					&& bitBoardInstance.getPieceBitBoard(color, PieceType.ROOK) == 0) {
+				// no more rook and queen.
+				final int numberOfKnights = Long.bitCount(bitBoardInstance.getPieceBitBoard(color, PieceType.KNIGHT));
+				if (numberOfKnights > 1) {
+					// two knights - cant force mate but are still
+					// sufficient.
+					result = true;
+				} else {
+					final long bishops = bitBoardInstance.getPieceBitBoard(color, PieceType.BISHOP);
+					final int whiteBishops = Long.bitCount(bishops & bitBoardPreCalculations.getWhiteFields());
+					final int blackBishops = Long.bitCount(bishops & bitBoardPreCalculations.getBlackFields());
+					if (whiteBishops == 0 && blackBishops == 0 && numberOfKnights == 0) {
+						// nothing but the bare king.
+						result = false;
+					} else if (whiteBishops > 0 && blackBishops > 0) {
+						result = true;
+					} else if ((whiteBishops > 0 || blackBishops > 0) && numberOfKnights == 1) {
+						// mate with knight and bishop can be forced.
+						result = true;
+					} else {
+						// there is some material left
+						final int otherSide = Long.bitCount(bitBoardInstance.getColorBitBoard(color.getOtherColor()));
+						if (otherSide > 1) {
+							// the other side has material that could block
+							// the
+							// flight squares.
+							// TODO maybe implement an approach that does
+							// the
+							// worst moves for one side ;)
+							result = true;
+						} else {
+							// the other side has no material that could
+							// block
+							// the flight squares - draw.
+							result = false;
+						}
+					}
+				}
+			} else {
+				result = true;
+			}
+		} else {
+			result = true;
+		}
+		return result;
 	}
 
 }

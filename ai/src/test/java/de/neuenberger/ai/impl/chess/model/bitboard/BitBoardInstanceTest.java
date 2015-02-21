@@ -44,7 +44,7 @@ public class BitBoardInstanceTest {
 	public void testScore() {
 		bitBoardInstance.setPiece(whitePawn, positionC2);
 		bitBoardInstance.setPiece(whiteQueen, positionC1);
-		Assertions.assertThat(bitBoardInstance.getPieceScore()).isEqualTo(93);
+		Assertions.assertThat(bitBoardInstance.getPieceScore()).isEqualTo(930);
 	}
 
 	@Test
