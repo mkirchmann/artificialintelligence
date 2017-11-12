@@ -1,20 +1,18 @@
 package de.neuenberger.ai.impl.chess.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public class BasePlyList implements PlyList {
 	final List<ChessPly> chessPlyList;
-	final List<ChessPly> unmodifiablePlyList;
 
 	public BasePlyList() {
-		this(new LinkedList<ChessPly>());
+		this(new ArrayList<ChessPly>(50));
 	}
 
 	public BasePlyList(final List<ChessPly> chessPlyList) {
 		this.chessPlyList = chessPlyList;
-		unmodifiablePlyList = Collections.unmodifiableList(chessPlyList);
 	}
 
 	@Override
@@ -24,6 +22,6 @@ public class BasePlyList implements PlyList {
 
 	@Override
 	public List<ChessPly> getCollection() {
-		return unmodifiablePlyList;
+		return Collections.unmodifiableList(chessPlyList);
 	}
 }

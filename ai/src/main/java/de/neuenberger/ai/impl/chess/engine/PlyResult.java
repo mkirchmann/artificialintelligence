@@ -1,6 +1,6 @@
 package de.neuenberger.ai.impl.chess.engine;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
@@ -15,7 +15,7 @@ public abstract class PlyResult<ScoreType> implements Comparable<PlyResult> {
 		this.targetBoard = targetBoard;
 	}
 
-	List<ChessPly> plies = new LinkedList<>();
+	List<ChessPly> plies = new ArrayList<>(50);
 
 	/**
 	 * @return the score

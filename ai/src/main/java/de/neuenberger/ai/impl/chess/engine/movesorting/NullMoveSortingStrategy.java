@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
@@ -33,8 +32,8 @@ public class NullMoveSortingStrategy extends AbstractMoveSortingStrategy {
 	@Override
 	public List<ChessPly> sortMoves(final ChessBoard chessBoard, final Color colorToMove, final List<ChessPly> moves) {
 		final List<ChessPly> result;
-		result = new LinkedList<>();
-		final List<ChessPly> movesForNullMovePruning = new LinkedList<>();
+		result = new ArrayList<>(50);
+		final List<ChessPly> movesForNullMovePruning = new ArrayList<>(50);
 		final List<ChessPly> simpleScoredMoves = new ArrayList<>(moves.size());
 		for (final ChessPly chessPly : moves) {
 			if (chessPly.getMoveDeltaScore() > 0) {

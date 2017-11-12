@@ -1,8 +1,8 @@
 package de.neuenberger.ai.impl.chess.model.bitboard;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -120,7 +120,7 @@ public class BitBoardPreCalculations {
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				final Position position = fromZeroBasedCoordinates(x, y);
-				kingNormalFieldsPositionsList[position.getIdx()] = new LinkedList<>();
+				kingNormalFieldsPositionsList[position.getIdx()] = new ArrayList<>(50);
 
 				checkBoundsAndAdd(kingNormalFieldsPositionsList[position.getIdx()], x + 1, y + 1);
 				checkBoundsAndAdd(kingNormalFieldsPositionsList[position.getIdx()], x + 1, y);
@@ -141,7 +141,7 @@ public class BitBoardPreCalculations {
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				final Position position = fromZeroBasedCoordinates(x, y);
-				knightMovesPositionsList[position.getIdx()] = new LinkedList<>();
+				knightMovesPositionsList[position.getIdx()] = new ArrayList<>(8);
 				checkBoundsAndAdd(knightMovesPositionsList[position.getIdx()], x + 1, y + 2);
 				checkBoundsAndAdd(knightMovesPositionsList[position.getIdx()], x + 1, y - 2);
 				checkBoundsAndAdd(knightMovesPositionsList[position.getIdx()], x - 1, y + 2);
@@ -173,10 +173,10 @@ public class BitBoardPreCalculations {
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				final Position position = fromZeroBasedCoordinates(x, y);
-				topVerticalPositionsList[position.getIdx()] = new LinkedList<>();
-				bottomVerticalPositionsList[position.getIdx()] = new LinkedList<>();
-				leftHorizontalPositionsList[position.getIdx()] = new LinkedList<>();
-				rightHorizontalPositionsList[position.getIdx()] = new LinkedList<>();
+				topVerticalPositionsList[position.getIdx()] = new ArrayList<>(50);
+				bottomVerticalPositionsList[position.getIdx()] = new ArrayList<>(50);
+				leftHorizontalPositionsList[position.getIdx()] = new ArrayList<>(50);
+				rightHorizontalPositionsList[position.getIdx()] = new ArrayList<>(50);
 				for (int i = 1; i < 8; i++) {
 					if (!checkBoundsAndAdd(rightHorizontalPositionsList[position.getIdx()], x + i, y)) {
 						break;
@@ -213,10 +213,10 @@ public class BitBoardPreCalculations {
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				final Position position = fromZeroBasedCoordinates(x, y);
-				upperLeftDiagonalPositionsList[position.getIdx()] = new LinkedList<>();
-				upperRightDiagonalPositionsList[position.getIdx()] = new LinkedList<>();
-				lowerLeftDiagonalPositionsList[position.getIdx()] = new LinkedList<>();
-				lowerRightDiagonalPositionsList[position.getIdx()] = new LinkedList<>();
+				upperLeftDiagonalPositionsList[position.getIdx()] = new ArrayList<>(50);
+				upperRightDiagonalPositionsList[position.getIdx()] = new ArrayList<>(50);
+				lowerLeftDiagonalPositionsList[position.getIdx()] = new ArrayList<>(50);
+				lowerRightDiagonalPositionsList[position.getIdx()] = new ArrayList<>(50);
 
 				for (int i = 1; i < 8; i++) {
 					if (!checkBoundsAndAdd(upperLeftDiagonalPositionsList[position.getIdx()], x - i, y + i)) {
@@ -268,10 +268,10 @@ public class BitBoardPreCalculations {
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				final Position position = fromZeroBasedCoordinates(x, y);
-				blackPawnNormalMovesPositionsList[position.getIdx()] = new LinkedList<>();
-				whitePawnNormalMovesPositionsList[position.getIdx()] = new LinkedList<>();
-				blackPawnCaptureMovesPositionsList[position.getIdx()] = new LinkedList<>();
-				whitePawnCaptureMovesPositionsList[position.getIdx()] = new LinkedList<>();
+				blackPawnNormalMovesPositionsList[position.getIdx()] = new ArrayList<>(2);
+				whitePawnNormalMovesPositionsList[position.getIdx()] = new ArrayList<>(2);
+				blackPawnCaptureMovesPositionsList[position.getIdx()] = new ArrayList<>(2);
+				whitePawnCaptureMovesPositionsList[position.getIdx()] = new ArrayList<>(2);
 				checkBoundsAndAdd(blackPawnNormalMovesPositionsList[position.getIdx()], x, y - 1);
 				if (y == 6) {
 					checkBoundsAndAdd(blackPawnNormalMovesPositionsList[position.getIdx()], x, y - 2);

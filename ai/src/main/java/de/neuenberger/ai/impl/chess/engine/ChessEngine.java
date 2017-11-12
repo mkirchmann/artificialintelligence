@@ -1,7 +1,7 @@
 package de.neuenberger.ai.impl.chess.engine;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -60,7 +60,7 @@ public class ChessEngine {
 	}
 
 	public PlyResult getBestMove() {
-		final List<PlyResult> recordMoves = new LinkedList<>();
+		final List<PlyResult> recordMoves = new ArrayList<>(50);
 		final PlyResult result = getBestMove(board, seekBestMoveFor, recursions, recordMoves, moveSortingStrategy,
 				null, null);
 		return result;
@@ -84,11 +84,11 @@ public class ChessEngine {
 	 * @return Returns a list of the rated moves.
 	 */
 	protected List<PlyResult> getBestMoveIterativeDeepening(final int deepeningRecursions, final ChessBoard board) {
-		final List<PlyResult> recordMoves = new LinkedList<>();
+		final List<PlyResult> recordMoves = new ArrayList<>(50);
 		PlyResult bestMove = getBestMove(board, seekBestMoveFor, recursions, recordMoves, moveSortingStrategy, null,
 				null);
 		int idx = 0;
-		final List<PlyResult> result = new LinkedList<>();
+		final List<PlyResult> result = new ArrayList<>(50);
 		if (deepeningRecursions <= 0) {
 			result.addAll(recordMoves);
 		} else {
