@@ -3,6 +3,7 @@ package de.neuenberger.ai.impl.chess.engine;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.impl.Log4jFactory;
@@ -10,6 +11,7 @@ import org.apache.commons.logging.impl.Log4jFactory;
 import de.neuenberger.ai.impl.chess.engine.movesorting.FifoStrategy;
 import de.neuenberger.ai.impl.chess.engine.movesorting.MoveSortingStrategy;
 import de.neuenberger.ai.impl.chess.engine.movesorting.NullMoveSortingStrategy;
+import de.neuenberger.ai.impl.chess.engine.scoring.PruningWindow;
 import de.neuenberger.ai.impl.chess.engine.scoring.ScoreStrategy;
 import de.neuenberger.ai.impl.chess.engine.scoring.SimpleScoreStrategy;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
@@ -62,7 +64,7 @@ public class ChessEngine {
 	public PlyResult getBestMove() {
 		final List<PlyResult> recordMoves = new ArrayList<>(50);
 		final PlyResult result = getBestMove(board, seekBestMoveFor, recursions, recordMoves, moveSortingStrategy,
-				null, null);
+				new PruningWindow(), true);
 		return result;
 	}
 
@@ -85,8 +87,8 @@ public class ChessEngine {
 	 */
 	protected List<PlyResult> getBestMoveIterativeDeepening(final int deepeningRecursions, final ChessBoard board) {
 		final List<PlyResult> recordMoves = new ArrayList<>(50);
-		PlyResult bestMove = getBestMove(board, seekBestMoveFor, recursions, recordMoves, moveSortingStrategy, null,
-				null);
+		PlyResult bestMove = getBestMove(board, seekBestMoveFor, recursions, recordMoves, moveSortingStrategy,
+				new PruningWindow(), true);
 		int idx = 0;
 		final List<PlyResult> result = new ArrayList<>(50);
 		if (deepeningRecursions <= 0) {
@@ -141,15 +143,16 @@ public class ChessEngine {
 	}
 
 	protected PlyResult getBestMove(final ChessBoard board, final Color color, final int recursions,
-			final List<PlyResult> recordMoves, final MoveSortingStrategy moveSortingStrategy, PlyResult alpha,
-			PlyResult beta) {
+			final List<PlyResult> recordMoves, final MoveSortingStrategy moveSortingStrategy,
+			PruningWindow pruningWindow, boolean parallelize) {
 		PlyResult result = null;
 
 		final List<ChessPly> plies = board.getPossiblePlies(color);
 
+		boolean maximizing = color == seekBestMoveFor;
 		if (plies.isEmpty()) {
 			if (board.isCheck()) {
-				if (color == seekBestMoveFor) {
+				if (maximizing) {
 					result = new TerminationScorePlyResult(TerminationScore.MATED, board);
 				} else {
 					result = new TerminationScorePlyResult(TerminationScore.MATE, board);
@@ -164,54 +167,46 @@ public class ChessEngine {
 			result = new IntegerScorePlyResult(score, board);
 		} else {
 
-			final List<ChessPly> sortedMoves = moveSortingStrategy.sortMoves(board, color, plies);
-
-			for (final ChessPly chessPly : sortedMoves) {
-				final PlyResult currentPlyResult;
-
-				final ChessBoard apply = board.apply(chessPly);
-
-				currentPlyResult = getBestMove(apply, color.getOtherColor(), recursions - 1, null,
-						moveSortingStrategy.getNextMoveSortingStrategy(), alpha, beta);
-				currentPlyResult.insertPly(chessPly);
-				final PlyResult currentScore = currentPlyResult;
-				if (recordMoves != null) {
-					recordMoves.add(currentScore);
-					// record top level move calculation results.
-					log.info("checking move for " + color + " with " + recursions + " recursions resulted in "
-							+ currentScore);
-
-				}
-				final boolean use;
-				if (result == null) {
-					result = currentScore;
-				} else if (color == seekBestMoveFor) { // maximizing
-					if (result.compareTo(currentScore) < 0) {
-						result = currentScore;
-					}
-					if (alpha == null) {
-						alpha = currentScore;
-					} else if (alpha.compareTo(currentScore) < 0) {
-						alpha = currentScore;
-					}
-				} else if (color != seekBestMoveFor) {
-					if (result.compareTo(currentScore) > 0) { // minimizing
-						result = currentScore;
-					}
-					if (beta == null) {
-						beta = currentScore;
-					} else {
-						if (beta.compareTo(currentScore) > 0) {
-							beta = currentScore;
-						}
-					}
-				}
-				if (beta != null && alpha != null && beta.compareTo(alpha) < 0) {
-					break; // cut off.
-				}
+			Stream<ChessPly> sortedMoves = moveSortingStrategy.sortMoves(board, color, plies).stream();
+			if (parallelize) {
+				sortedMoves = sortedMoves.parallel();
 			}
-		}
+			sortedMoves.forEach(chessPly -> {
+				PlyResult innerResult = null;
+				if (!pruningWindow.cutOffConditionMet()) {
+					final PlyResult currentPlyResult;
 
+					final ChessBoard apply = board.apply(chessPly);
+
+					currentPlyResult = getBestMove(apply, color.getOtherColor(), recursions - 1, null,
+							moveSortingStrategy.getNextMoveSortingStrategy(), pruningWindow.clone(), false);
+					currentPlyResult.insertPly(chessPly);
+					final PlyResult currentScore = currentPlyResult;
+					if (recordMoves != null) {
+						recordMoves.add(currentScore);
+						// record top level move calculation results.
+						log.info("checking move for " + color + " with " + recursions + " recursions resulted in "
+								+ currentScore);
+
+					}
+					if (!pruningWindow.hasBestScore()) {
+						pruningWindow.setBestScore(currentScore);
+					}
+					if (maximizing) { // maximizing
+						if (pruningWindow.getBestScore().compareTo(currentScore) < 0) {
+							pruningWindow.setBestScore(currentScore);
+						}
+						pruningWindow.useAlphaIfBetter(currentScore);
+					} else {
+						if (pruningWindow.getBestScore().compareTo(currentScore) > 0) { // minimizing
+							pruningWindow.setBestScore(currentScore);
+						}
+						pruningWindow.useBetaIfBetter(currentScore);
+					}
+				}
+			});
+			return pruningWindow.getBestScore();
+		}
 		return result;
 	}
 
