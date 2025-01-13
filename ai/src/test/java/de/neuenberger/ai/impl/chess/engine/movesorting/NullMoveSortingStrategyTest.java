@@ -5,12 +5,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessPly;
@@ -19,7 +19,7 @@ import de.neuenberger.ai.impl.chess.model.Piece.Color;
 import de.neuenberger.ai.impl.chess.model.Piece.PieceType;
 import de.neuenberger.ai.impl.chess.model.bitboard.BitBoardInstance;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class NullMoveSortingStrategyTest {
 	private NullMoveSortingStrategy strategy;
 
@@ -29,7 +29,7 @@ public class NullMoveSortingStrategyTest {
 	@Mock
 	BitBoardInstance bitBoardInstance;
 
-	@Before
+	@BeforeEach
 	public void before() {
 
 		Mockito.when(chessBoard.getBitBoardInstance()).thenReturn(bitBoardInstance);

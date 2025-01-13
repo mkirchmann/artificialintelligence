@@ -1,8 +1,8 @@
 package de.neuenberger.ai.impl.chess.model.bitboard;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import de.neuenberger.ai.impl.chess.model.ChessBoardFactory;
 import de.neuenberger.ai.impl.chess.model.Piece;
@@ -34,7 +34,7 @@ public class BitBoardInstanceTest {
 
 	private final Piece blackPawn = new Pawn(Color.BLACK);
 
-	@Before
+	@BeforeEach
 	public void before() {
 
 		bitBoardInstance = new BitBoardInstance(instance);

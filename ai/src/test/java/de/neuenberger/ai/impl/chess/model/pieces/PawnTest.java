@@ -3,7 +3,7 @@ package de.neuenberger.ai.impl.chess.model.pieces;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import de.neuenberger.ai.impl.chess.model.BasePlyList;
 import de.neuenberger.ai.impl.chess.model.ChessBoard;

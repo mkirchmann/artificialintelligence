@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessBoardFactory;
@@ -18,7 +18,7 @@ public class ChessBoardTest {
 	private ChessBoard chessBoard;
 	private ChessBoardFactory chessBoardFactory;
 
-	@Before
+	@BeforeEach
 	public void before() {
 		chessBoardFactory = new ChessBoardFactory();
 		chessBoard = chessBoardFactory.createInitalSetup();

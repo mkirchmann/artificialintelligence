@@ -1,8 +1,8 @@
 package de.neuenberger.ai.impl.chess.model.bitboard;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,7 @@ public class BitBoardPreCalculationsTest {
 
 	Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Before
+	@BeforeEach
 	public void before() {
 		instance = BitBoardPreCalculations.getInstance();
 	}

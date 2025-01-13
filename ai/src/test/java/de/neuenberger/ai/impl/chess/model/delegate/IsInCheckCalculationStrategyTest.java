@@ -1,8 +1,8 @@
 package de.neuenberger.ai.impl.chess.model.delegate;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import de.neuenberger.ai.impl.chess.model.ChessBoard;
 import de.neuenberger.ai.impl.chess.model.ChessBoardBuilder;
@@ -27,7 +27,7 @@ public class IsInCheckCalculationStrategyTest {
 			new Pawn(Color.WHITE), new Queen(Color.WHITE), new Rook(Color.WHITE), new Knight(Color.BLACK),
 			new Bishop(Color.BLACK), new Pawn(Color.BLACK), new Queen(Color.BLACK), new Rook(Color.BLACK) };
 
-	@Before
+	@BeforeEach
 	public void before() {
 		bruteForce = new IsInCheckBruteForceAllFieldsStrategy();
 		useBitBoard = new IsInCheckUseBitBoard();
