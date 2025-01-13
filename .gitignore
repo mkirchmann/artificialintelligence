@@ -5,6 +5,7 @@
 # eclipse
 .classpath
 .project
+.factorypath
 **/.settings
 
 # Mobile Tools for Java (J2ME)
